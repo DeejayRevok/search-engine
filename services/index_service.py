@@ -93,6 +93,8 @@ class IndexService:
             saved_new: NewModel = await new_service.read_one(title=new_title)
             if not saved_new:
                 saved_new = await new_service.save(title=new_title, sentiment=new_sentiment, source_id=source.id)
+            elif saved_new and saved_new.sentiment != new_sentiment:
+                saved_new = await new_service.update(saved_new, sentiment=new_sentiment)
             return saved_new
 
         async def _index_named_entities(named_entities: List[NamedEntity], entities_saved_new: NewModel):

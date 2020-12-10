@@ -46,6 +46,28 @@ class CRUDService:
         except StorageError as sterr:
             raise ValueError(f'Error saving with properties {properties}') from sterr
 
+    async def update(self, entity: BASE, **update_properties) -> BASE:
+        """
+        Update the given entity with the specified properties
+
+        Args:
+            entity: entity to update
+            **update_properties: properties to set to the entity
+
+        Returns: updated entity
+
+        """
+        if update_properties:
+            for property_key, property_value in update_properties.items():
+                if hasattr(entity, property_key):
+                    setattr(entity, property_key, property_value)
+                else:
+                    raise ValueError(f'{entity.__class__.__name__} has no property {property_key}')
+            try:
+                return self._repo.save(entity)
+            except StorageError as sterr:
+                raise ValueError(f'Error updating with properties {update_properties}') from sterr
+
     @staticmethod
     async def _parse_filters(**filters) -> List[Filter]:
         """
