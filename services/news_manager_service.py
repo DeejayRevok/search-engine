@@ -17,7 +17,10 @@ GET_NEW_BY_TITLE_QUERY = gql('''
             source
             date
             hydrated
-            entities
+            entities {
+              text
+              type
+            }
             summary
             sentiment
         }
