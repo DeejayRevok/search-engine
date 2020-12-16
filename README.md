@@ -1,6 +1,9 @@
 # search-engine
 News service Search Engine microservice
 
+![Search Engine Service](https://github.com/DeejayRevok/search-engine/workflows/Search%20Engine%20Service/badge.svg?branch=develop)
+[![codecov](https://codecov.io/gh/DeejayRevok/search-engine/branch/develop/graph/badge.svg?token=38GI3NI2MW)](https://codecov.io/gh/DeejayRevok/search-engine)
+
 #### Local running
 
 Run the parent's repo dev docker compose.
