@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
 
-  uaa-CI:
+  search-engine-CI:
     runs-on: ubuntu-latest
 
     steps:

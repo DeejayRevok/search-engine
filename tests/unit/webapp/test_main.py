@@ -1,5 +1,5 @@
 """
-News manager main tests module
+Search engine main tests module
 """
 import unittest
 from unittest.mock import patch
