@@ -27,6 +27,7 @@ class CRUDService:
         Args:
             session_provider: SQL sessions provider
         """
+
         self._repo: Storage = storage_factory(StorageType.SQL.value,
                                               dict(session_provider=session_provider, model=self.entity_class),
                                               logger=LOGGER)
@@ -95,7 +96,7 @@ class CRUDService:
 
         """
         filters = await self._parse_filters(**filters)
-        return self._repo.get(*filters)
+        return self._repo.get(filters)
 
     async def read_one(self, **filters) -> BASE:
         """
