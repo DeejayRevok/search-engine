@@ -19,21 +19,24 @@ from services.crud.source_service import SourceService
 from services.index_service import IndexService
 
 LOGGER = getLogger()
+
+TEST_ENTITY_TYPE_1 = "Test entity type 1"
+TEST_ENTITY_TYPE_2 = "Test entity type 2"
 TEST_NEW = New(title="Test title",
                content="Test content",
                source="Test source",
                sentiment=3.4,
                date=23452435.0,
-               entities=[NamedEntity(text="Test entity 1", type="Test entity type 1"),
-                         NamedEntity(text="Test entity 2", type="Test entity type 1")])
+               entities=[NamedEntity(text="Test entity 1", type=TEST_ENTITY_TYPE_1),
+                         NamedEntity(text="Test entity 2", type=TEST_ENTITY_TYPE_1)])
 
 TEST_NEW_2 = New(title="Test title 2",
                  content="Test content",
                  source="Test source",
                  sentiment=4.6,
                  date=2323452345.0,
-                 entities=[NamedEntity(text="Test entity 3", type="Test entity type 1"),
-                           NamedEntity(text="Test entity 4", type="Test entity type 2")])
+                 entities=[NamedEntity(text="Test entity 3", type=TEST_ENTITY_TYPE_1),
+                           NamedEntity(text="Test entity 4", type=TEST_ENTITY_TYPE_2)])
 
 
 class TestIndexService(TestCase):
@@ -115,10 +118,10 @@ class TestIndexService(TestCase):
             named_entity_types = list(await self.named_entity_type_service.read_all())
             self.assertEqual(len(named_entity_types), 2)
 
-            named_entity_type_1 = next(filter(lambda net: net.name == "Test entity type 1", named_entity_types))
+            named_entity_type_1 = next(filter(lambda net: net.name == TEST_ENTITY_TYPE_1, named_entity_types))
             self.assertIsNotNone(named_entity_type_1)
 
-            named_entity_type_2 = next(filter(lambda net: net.name == "Test entity type 2", named_entity_types))
+            named_entity_type_2 = next(filter(lambda net: net.name == TEST_ENTITY_TYPE_2, named_entity_types))
             self.assertIsNotNone(named_entity_type_2)
 
             named_entities_type_1 = named_entity_type_1.named_entities
