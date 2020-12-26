@@ -2,6 +2,7 @@
 Index Service Module
 """
 import asyncio
+import platform
 import sys
 from multiprocessing import Process
 import json
@@ -48,8 +49,9 @@ class IndexService:
             LOGGER.error('Error connecting to the queue provider. Exiting...')
             sys.exit(1)
 
-        self._consume_process = Process(target=self._exchange_consumer.__call__)
-        self._consume_process.start()
+        if platform.system() != 'Windows':
+            self._consume_process = Process(target=self._exchange_consumer.__call__)
+            self._consume_process.start()
 
     async def _index_source(self, source_name: str) -> Source:
         """
