@@ -18,8 +18,8 @@ class TrackInfo(ObjectType):
     field = String()
     value = String()
 
-    def __init__(self, operation: SearchOperation, field: SearchField, value: Any, previous_track: TrackInfo, *args,
-                 **kwargs):
+    def __init__(self, operation: SearchOperation, field: SearchField, value: Any, previous_track: Optional[TrackInfo],
+                 *args, **kwargs):
         """
         Initialize the track info module
 
