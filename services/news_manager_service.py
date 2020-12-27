@@ -70,6 +70,6 @@ class NewsManagerService:
         Returns: new identified by the specified title
 
         """
-        LOGGER.info(f'Requesting the new %s to the news manager', title)
+        LOGGER.info('Requesting the new %s to the news manager', title)
         self._initialize()
         return self._gql_client.execute(GET_NEW_BY_TITLE_QUERY, variable_values=dict(searchTitle=title))['new']
