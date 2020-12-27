@@ -1,3 +1,6 @@
+"""
+News manager service testing module
+"""
 from unittest import TestCase
 from unittest.mock import patch
 
@@ -7,7 +10,9 @@ from services.news_manager_service import NewsManagerService, GET_NEW_BY_TITLE_Q
 
 
 class TestNewsManagerService(TestCase):
-
+    """
+    News manager service test cases implementation
+    """
     @patch('services.news_manager_service.get_system_auth_token')
     @patch('services.news_manager_service.RequestsHTTPTransport')
     @patch('services.news_manager_service.Client')

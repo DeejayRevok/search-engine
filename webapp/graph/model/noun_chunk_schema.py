@@ -12,7 +12,7 @@ class NounChunkSchema(SQLAlchemyObjectType):
     """
     GraphQL noun chunk model schema
     """
-    class Meta(object):
+    class Meta:
         """
         Noun chunk schema metadata
         """
@@ -24,7 +24,7 @@ class NounChunkFilter(FilterSet):
     """
     GraphQL noun chunk filters schema
     """
-    class Meta(object):
+    class Meta:
         """
         Noun chunk filter schema metadata
         """

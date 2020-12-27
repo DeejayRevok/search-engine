@@ -18,7 +18,7 @@ class NewSchema(SQLAlchemyObjectType):
     """
     GraphQL new model schema
     """
-    class Meta(object):
+    class Meta:
         """
         New schema metadata
         """
@@ -49,7 +49,7 @@ class NewFilter(FilterSet):
     """
     GraphQL new filters schema
     """
-    class Meta(object):
+    class Meta:
         """
         New filter schema metadata
         """

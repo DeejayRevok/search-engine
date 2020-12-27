@@ -12,7 +12,7 @@ class Source(SQLAlchemyObjectType):
     """
     GraphQL source model schema
     """
-    class Meta(object):
+    class Meta:
         """
         New schema metadata
         """
@@ -24,7 +24,7 @@ class SourceFilter(FilterSet):
     """
     GraphQL source filters schema
     """
-    class Meta(object):
+    class Meta:
         """
         Source filter schema metadata
         """
