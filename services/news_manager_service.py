@@ -24,6 +24,7 @@ GET_NEW_BY_TITLE_QUERY = gql('''
             }
             summary
             sentiment
+            nounChunks
         }
     }
 ''')
