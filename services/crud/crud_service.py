@@ -6,10 +6,10 @@ from typing import Iterator, List, Any
 from news_service_lib.storage import StorageError, storage_factory, StorageType
 from news_service_lib.storage.filter import Filter, MatchFilter
 from news_service_lib.storage.implementation import Storage
+from news_service_lib.storage.sql import SqlSessionProvider
 
 from log_config import get_logger
 from models import BASE
-from news_service_lib.storage.sql import SqlSessionProvider
 
 LOGGER = get_logger()
 

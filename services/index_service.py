@@ -10,7 +10,6 @@ from typing import List
 
 from aiohttp.web_app import Application
 
-from models import Source, NamedEntityType
 from news_service_lib.models import New, NamedEntity
 from news_service_lib.messaging.exchange_consumer import ExchangeConsumer
 
@@ -20,6 +19,7 @@ from services.crud.named_entity_type_service import NamedEntityTypeService
 from services.crud.new_service import NewService
 from services.crud.noun_chunk_service import NounChunkService
 from services.crud.source_service import SourceService
+from models import Source, NamedEntityType
 from models import New as NewModel
 from models import NamedEntity as NamedEntityModel
 from models import NounChunk as NounChunkModel

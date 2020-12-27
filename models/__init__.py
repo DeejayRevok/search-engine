@@ -1,3 +1,6 @@
+"""
+Database models definitions module
+"""
 from models.source import Source
 from models.new import New
 from models.named_entity import NamedEntity
