@@ -2,6 +2,7 @@
 Index Service Module
 """
 import asyncio
+import platform
 import sys
 from multiprocessing import Process
 import json
@@ -9,7 +10,6 @@ from typing import List
 
 from aiohttp.web_app import Application
 
-from models import Source, NamedEntityType
 from news_service_lib.models import New, NamedEntity
 from news_service_lib.messaging.exchange_consumer import ExchangeConsumer
 
@@ -17,9 +17,12 @@ from log_config import get_logger
 from services.crud.named_entity_service import NamedEntityService
 from services.crud.named_entity_type_service import NamedEntityTypeService
 from services.crud.new_service import NewService
+from services.crud.noun_chunk_service import NounChunkService
 from services.crud.source_service import SourceService
+from models import Source, NamedEntityType
 from models import New as NewModel
 from models import NamedEntity as NamedEntityModel
+from models import NounChunk as NounChunkModel
 
 LOGGER = get_logger()
 
@@ -48,8 +51,10 @@ class IndexService:
             LOGGER.error('Error connecting to the queue provider. Exiting...')
             sys.exit(1)
 
-        self._consume_process = Process(target=self._exchange_consumer.__call__)
-        self._consume_process.start()
+        if platform.system() != 'Windows':
+            LOGGER.info('Starting consumer process')
+            self._consume_process = Process(target=self._exchange_consumer.__call__)
+            self._consume_process.start()
 
     async def _index_source(self, source_name: str) -> Source:
         """
@@ -139,6 +144,36 @@ class IndexService:
             named_ent_type = await _index_named_entity_type(named_entity.type)
             await _index_named_entity(named_entity.text, named_ent_type, entities_saved_new)
 
+    async def _index_noun_chunks(self, noun_chunks: List[str], chunks_saved_new: NewModel):
+        """
+        Index the noun chunks into the database
+
+        Args:
+            noun_chunks:  noun chunks data to index
+            chunks_saved_new: indexed new where the noun chunks appear
+        """
+
+        async def _index_noun_chunk(value: str, new_model: NewModel) -> NounChunkModel:
+            """
+            Index the named entity data
+
+            Args:
+                value: noun chunk value
+                new_model: indexed new where the noun chunk appears
+
+            Returns: indexed noun chunk
+
+            """
+            noun_chunks_service: NounChunkService = self._app['noun_chunks_service']
+            saved_noun_chunk: NounChunkModel = await noun_chunks_service.read_one(value=value)
+            if not saved_noun_chunk:
+                saved_noun_chunk = await noun_chunks_service.save(value=value)
+            saved_noun_chunk.news.append(new_model)
+            return saved_noun_chunk
+
+        for noun_chunk in noun_chunks:
+            await _index_noun_chunk(noun_chunk, chunks_saved_new)
+
     async def index_new(self, new: New) -> NewModel:
         """
         Index the input new data with its related entities info into the database
@@ -158,6 +193,9 @@ class IndexService:
 
             if new.entities:
                 await self._index_named_entities(new.entities, saved_new_model)
+
+            if new.noun_chunks:
+                await self._index_noun_chunks(new.noun_chunks, saved_new_model)
 
         return saved_new_model
 
@@ -180,7 +218,8 @@ class IndexService:
                       hydrated=body['hydrated'],
                       summary=body['summary'],
                       sentiment=body['sentiment'],
-                      entities=[NamedEntity(**entity) for entity in body['entities']])
+                      entities=[NamedEntity(**entity) for entity in body['entities']],
+                      noun_chunks=body['noun_chunks'])
 
             asyncio.run(self.index_new(new))
 

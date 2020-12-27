@@ -12,7 +12,7 @@ class NamedEntitySchema(SQLAlchemyObjectType):
     """
     GraphQL named entity model schema
     """
-    class Meta(object):
+    class Meta:
         """
         Named entity schema metadata
         """
@@ -25,7 +25,7 @@ class NamedEntityFilter(FilterSet):
     """
     GraphQL named entity filters schema
     """
-    class Meta(object):
+    class Meta:
         """
         Named entity filter schema metadata
         """

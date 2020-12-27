@@ -1,3 +1,6 @@
+"""
+Index views module
+"""
 from aiohttp.web_app import Application
 from aiohttp.web_exceptions import HTTPBadRequest
 from aiohttp.web_request import Request

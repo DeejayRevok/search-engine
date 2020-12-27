@@ -8,10 +8,10 @@ from unittest.mock import patch, MagicMock
 
 from aiohttp.web_app import Application
 from aiounittest import async_test
-
-from models import BASE, New as NewModel
 from news_service_lib.models import New, NamedEntity
 from news_service_lib.storage.sql import create_sql_engine, SqlEngineType, init_sql_db, SqlSessionProvider
+
+from models import BASE, New as NewModel
 from services.crud.named_entity_service import NamedEntityService
 from services.crud.named_entity_type_service import NamedEntityTypeService
 from services.crud.new_service import NewService

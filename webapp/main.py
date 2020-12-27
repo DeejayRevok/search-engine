@@ -6,21 +6,23 @@ import sys
 from aiohttp.web_app import Application
 from aiohttp_apispec import validation_middleware
 
-from models import BASE
 from news_service_lib import HealthCheck, server_runner, uaa_auth_middleware, get_uaa_service, initialize_apm
 from news_service_lib.graphql import setup_graphql_routes
 from news_service_lib.storage.sql import create_sql_engine, SqlEngineType, init_sql_db, sql_health_check, \
     SqlSessionProvider
 
 from log_config import LOG_CONFIG, get_logger
+from models import BASE
 from services.crud.named_entity_service import NamedEntityService
 from services.crud.named_entity_type_service import NamedEntityTypeService
 from services.crud.new_service import NewService
+from services.crud.noun_chunk_service import NounChunkService
 from services.crud.source_service import SourceService
 from services.index_service import IndexService
 from services.news_manager_service import NewsManagerService
 from webapp.definitions import API_VERSION, CONFIG_PATH, health_check
 from webapp.graph import schema
+from webapp.graph.utils.middlewares import SQLMiddleware
 from webapp.middlewares import error_middleware
 from webapp.views import index_views
 
@@ -62,6 +64,7 @@ def init_search_engine(app: Application) -> Application:
     app['new_service'] = NewService(sql_session_provider)
     app['named_entity_service'] = NamedEntityService(sql_session_provider)
     app['named_entity_type_service'] = NamedEntityTypeService(sql_session_provider)
+    app['noun_chunks_service'] = NounChunkService(sql_session_provider)
 
     initialize_apm(app)
 
@@ -75,7 +78,7 @@ def init_search_engine(app: Application) -> Application:
 
     HealthCheck(app, health_check)
 
-    setup_graphql_routes(app, schema, get_logger())
+    setup_graphql_routes(app, schema, get_logger(), middlewares=[SQLMiddleware(app['session_provider'])])
     index_views.setup_routes(app)
 
     app.middlewares.append(error_middleware)

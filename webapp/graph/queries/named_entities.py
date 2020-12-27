@@ -18,7 +18,7 @@ class NamedEntityQueries(ObjectType):
     """
     named_entities: List[NamedEntitySchema] = AuthenticatedFilterableField(NamedEntitySchema.connection,
                                                                            filters=NamedEntityFilter())
-    named_entity: NamedEntitySchema = Field(NamedEntitySchema, title=String())
+    named_entity: NamedEntitySchema = Field(NamedEntitySchema, value=String())
 
     @staticmethod
     @login_required

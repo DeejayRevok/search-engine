@@ -1,3 +1,6 @@
+"""
+Named entity type database model definition module
+"""
 from sqlalchemy import Column, Integer, String
 
 from models.base import BASE

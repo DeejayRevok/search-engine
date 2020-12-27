@@ -1,3 +1,6 @@
+"""
+Named entity database model definition module
+"""
 from sqlalchemy import Column, Integer, String, Table, ForeignKey
 from sqlalchemy.orm import relationship, backref
 

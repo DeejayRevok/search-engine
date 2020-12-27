@@ -1,3 +1,6 @@
+"""
+New database model definition module
+"""
 from sqlalchemy import Column, Integer, String, Float, ForeignKey
 from sqlalchemy.orm import relationship, backref
 
