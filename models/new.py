@@ -18,6 +18,7 @@ class New(BASE):
 
     id = Column(Integer, primary_key=True)
     title = Column(String(255), unique=True)
+    url = Column(String(2083), unique=True, nullable=False)
     sentiment = Column(Float)
     source_id = Column(ForeignKey('source.id'), nullable=False, index=True)
 
@@ -44,3 +45,4 @@ class New(BASE):
         """
         yield 'title', self.title
         yield 'sentiment', self.sentiment
+        yield 'url', self.url

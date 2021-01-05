@@ -15,6 +15,7 @@ GET_NEW_BY_TITLE_QUERY = gql('''
     query getNewByTitle($searchTitle: String!) {
         new(title: $searchTitle){
             title
+            url
             content
             source
             date

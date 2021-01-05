@@ -51,6 +51,7 @@ class IndexService:
             LOGGER.error('Error connecting to the queue provider. Exiting...')
             sys.exit(1)
 
+        self._consume_process = None
         if platform.system() != 'Windows':
             LOGGER.info('Starting consumer process')
             self._consume_process = Process(target=self._exchange_consumer.__call__)
@@ -72,12 +73,13 @@ class IndexService:
             saved_source = await source_service.save(name=source_name)
         return saved_source
 
-    async def _index_new(self, new_title: str, new_sentiment: float, source: Source) -> NewModel:
+    async def _index_new(self, new_title: str, new_url: str, new_sentiment: float, source: Source) -> NewModel:
         """
         Index the new data
 
         Args:
             new_title: new title
+            new_url: new url
             new_sentiment: new sentiment score
             source: new indexed source
 
@@ -87,7 +89,8 @@ class IndexService:
         new_service: NewService = self._app['new_service']
         saved_new: NewModel = await new_service.read_one(title=new_title)
         if not saved_new:
-            saved_new = await new_service.save(title=new_title, sentiment=new_sentiment, source_id=source.id)
+            saved_new = await new_service.save(title=new_title, url=new_url, sentiment=new_sentiment,
+                                               source_id=source.id)
         elif saved_new and saved_new.sentiment != new_sentiment:
             saved_new = await new_service.update(saved_new, sentiment=new_sentiment)
         return saved_new
@@ -189,7 +192,7 @@ class IndexService:
                 saved_source_model = await self._index_source(new.source)
 
             if new.title:
-                saved_new_model = await self._index_new(new.title, new.sentiment, saved_source_model)
+                saved_new_model = await self._index_new(new.title, new.url, new.sentiment, saved_source_model)
 
             if new.entities:
                 await self._index_named_entities(new.entities, saved_new_model)
@@ -212,6 +215,7 @@ class IndexService:
         try:
             body = json.loads(body)
             new = New(title=body['title'],
+                      url=body['url'],
                       content=body['content'],
                       source=body['source'],
                       date=body['date'],
@@ -235,4 +239,5 @@ class IndexService:
         """
         LOGGER.info('Shutting down indexing service')
         self._exchange_consumer.shutdown()
-        self._consume_process.join()
+        if self._consume_process:
+            self._consume_process.join()
