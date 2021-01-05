@@ -8,6 +8,7 @@ from news_service_lib.storage.sql import sql_health_check
 
 API_VERSION = 'v1'
 CONFIG_PATH = join(dirname(dirname(__file__, )), 'configs')
+ALEMBIC_INI_PATH = join(dirname(dirname(__file__, )), 'alembic.ini')
 
 
 async def health_check(app: Application) -> bool:

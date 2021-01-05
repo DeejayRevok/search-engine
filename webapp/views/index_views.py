@@ -59,6 +59,7 @@ class IndexViews:
 
             try:
                 new_data = New(title=inner_request['data']['title'],
+                               url=inner_request['data']['url'],
                                content=inner_request['data']['content'],
                                source=inner_request['data']['source'],
                                date=inner_request['data']['date'],

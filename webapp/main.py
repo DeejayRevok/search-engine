@@ -20,7 +20,7 @@ from services.crud.noun_chunk_service import NounChunkService
 from services.crud.source_service import SourceService
 from services.index_service import IndexService
 from services.news_manager_service import NewsManagerService
-from webapp.definitions import API_VERSION, CONFIG_PATH, health_check
+from webapp.definitions import API_VERSION, CONFIG_PATH, health_check, ALEMBIC_INI_PATH
 from webapp.graph import schema
 from webapp.graph.utils.middlewares import SQLMiddleware
 from webapp.middlewares import error_middleware
@@ -51,7 +51,7 @@ def init_search_engine(app: Application) -> Application:
     storage_engine = create_sql_engine(SqlEngineType.MYSQL, **storage_config)
     app['storage_engine'] = storage_engine
 
-    init_sql_db(BASE, storage_engine)
+    init_sql_db(BASE, storage_engine, alembic_ini_path=ALEMBIC_INI_PATH)
 
     if not sql_health_check(storage_engine):
         sys.exit(1)

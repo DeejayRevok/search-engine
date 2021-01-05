@@ -17,6 +17,7 @@ class PostIndexSchema(Schema):
     Class which describes the schema of the post index request
     """
     title = fields.Str(description='New title', required=True)
+    url = fields.Str(description='New url', required=True)
     source = fields.Str(description='New source name', required=True)
     sentiment = fields.Float(description='New sentiment', required=False)
     date = fields.Float(description='New publish date', required=True)
