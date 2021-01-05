@@ -2,6 +2,7 @@
 Index service tests module
 """
 import json
+import platform
 from logging import getLogger
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
@@ -23,6 +24,7 @@ LOGGER = getLogger()
 TEST_ENTITY_TYPE_1 = "Test entity type 1"
 TEST_ENTITY_TYPE_2 = "Test entity type 2"
 TEST_NEW = New(title="Test title",
+               url='https://test.test',
                content="Test content",
                source="Test source",
                sentiment=3.4,
@@ -31,6 +33,7 @@ TEST_NEW = New(title="Test title",
                          NamedEntity(text="Test entity 2", type=TEST_ENTITY_TYPE_1)])
 
 TEST_NEW_2 = New(title="Test title 2",
+                 url='https://test2.test',
                  content="Test content",
                  source="Test source",
                  sentiment=4.6,
@@ -77,8 +80,9 @@ class TestIndexService(TestCase):
         and starts the process
         """
         self.consumer_mock.assert_called_once()
-        self.process_mock.assert_called_with(target=self.consumer_mock().__call__)
-        self.process_mock().start.assert_called_once()
+        if platform.system() != 'Windows':
+            self.process_mock.assert_called_with(target=self.consumer_mock().__call__)
+            self.process_mock().start.assert_called_once()
 
     @async_test
     async def test_index_new(self):
@@ -174,4 +178,5 @@ class TestIndexService(TestCase):
         """
         await self.index_service.shutdown()
         self.consumer_mock().shutdown.assert_called_once()
-        self.process_mock().join.assert_called_once()
+        if platform.system() != 'Windows':
+            self.process_mock().join.assert_called_once()

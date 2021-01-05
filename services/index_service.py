@@ -51,6 +51,7 @@ class IndexService:
             LOGGER.error('Error connecting to the queue provider. Exiting...')
             sys.exit(1)
 
+        self._consume_process = None
         if platform.system() != 'Windows':
             LOGGER.info('Starting consumer process')
             self._consume_process = Process(target=self._exchange_consumer.__call__)
@@ -238,4 +239,5 @@ class IndexService:
         """
         LOGGER.info('Shutting down indexing service')
         self._exchange_consumer.shutdown()
-        self._consume_process.join()
+        if self._consume_process:
+            self._consume_process.join()
