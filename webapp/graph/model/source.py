@@ -14,7 +14,7 @@ class Source(SQLAlchemyObjectType):
     """
     class Meta:
         """
-        New schema metadata
+        Source model schema metadata
         """
         model = SourceModel
         interfaces = (Node,)

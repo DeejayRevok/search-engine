@@ -207,7 +207,7 @@ class DeleteNewspaper(Mutation):
 
 class NewspaperMutations(ObjectType):
     """
-    Newspaper GraphQL model mutations
+    Newspaper GraphQL schema mutations
     """
     create_newspaper = CreateNewspaper.Field()
     update_newspaper = UpdateNewspaper.Field()
