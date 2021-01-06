@@ -16,6 +16,7 @@ from models import BASE
 from services.crud.named_entity_service import NamedEntityService
 from services.crud.named_entity_type_service import NamedEntityTypeService
 from services.crud.new_service import NewService
+from services.crud.newspaper_service import NewspaperService
 from services.crud.noun_chunk_service import NounChunkService
 from services.crud.source_service import SourceService
 from services.index_service import IndexService
@@ -65,6 +66,7 @@ def init_search_engine(app: Application) -> Application:
     app['named_entity_service'] = NamedEntityService(sql_session_provider)
     app['named_entity_type_service'] = NamedEntityTypeService(sql_session_provider)
     app['noun_chunks_service'] = NounChunkService(sql_session_provider)
+    app['newspaper_service'] = NewspaperService(sql_session_provider)
 
     initialize_apm(app)
 

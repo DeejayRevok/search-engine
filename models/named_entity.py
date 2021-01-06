@@ -6,6 +6,7 @@ from sqlalchemy.orm import relationship, backref
 
 from models.base import BASE
 from models.named_entity_type import NamedEntityType
+from models.newspaper import named_entities_association
 
 news_association = Table('new_named_entity', BASE.metadata,
                          Column('new_id', Integer, ForeignKey('new.id')),
@@ -29,6 +30,11 @@ class NamedEntity(BASE):
     news = relationship(
         "New",
         secondary=news_association,
+        back_populates="named_entities")
+
+    newspapers = relationship(
+        "Newspaper",
+        secondary=named_entities_association,
         back_populates="named_entities")
 
     def __iter__(self) -> iter:
