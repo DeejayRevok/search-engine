@@ -15,9 +15,9 @@ class UserSource(BASE):
     __tablename__ = 'user_source'
 
     id = Column(Integer, primary_key=True)
-    username = Column(String(255))
+    user_id = Column(Integer, nullable=False)
 
-    source_id = Column(ForeignKey('source.id'), nullable=False, index=True)
+    source_id = Column(ForeignKey('source.id', ondelete='CASCADE'), nullable=False, index=True)
 
     source: Source = relationship('Source',
                                   lazy='select',

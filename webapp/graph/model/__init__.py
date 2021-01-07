@@ -4,6 +4,8 @@ from webapp.graph.model.named_entity_schema import NamedEntitySchema, NamedEntit
 from webapp.graph.model.named_entity_type import NamedEntityType, NamedEntityTypeFilter
 from webapp.graph.model.noun_chunk_schema import NounChunkSchema, NounChunkFilter
 from webapp.graph.model.news_search_schema import NewsSearch
+from webapp.graph.model.newspaper import Newspaper, NewspaperFilter
+from webapp.graph.model.user_source import UserSource
 
 __all__ = [
     "NewSchema",
@@ -16,5 +18,8 @@ __all__ = [
     "NounChunkFilter",
     "NamedEntityType",
     "NamedEntityTypeFilter",
-    "NewsSearch"
+    "NewsSearch",
+    "Newspaper",
+    "NewspaperFilter",
+    "UserSource"
 ]

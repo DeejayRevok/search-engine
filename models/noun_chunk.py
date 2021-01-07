@@ -5,6 +5,7 @@ from sqlalchemy import Column, Integer, String, Table, ForeignKey
 from sqlalchemy.orm import relationship
 
 from models.base import BASE
+from models.newspaper import noun_chunks_association
 
 news_association = Table('new_noun_chunk', BASE.metadata,
                          Column('new_id', Integer, ForeignKey('new.id')),
@@ -23,6 +24,11 @@ class NounChunk(BASE):
     news = relationship(
         "New",
         secondary=news_association,
+        back_populates="noun_chunks")
+
+    newspapers = relationship(
+        "Newspaper",
+        secondary=noun_chunks_association,
         back_populates="noun_chunks")
 
     def __iter__(self) -> iter:
