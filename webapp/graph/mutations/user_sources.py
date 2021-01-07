@@ -16,7 +16,7 @@ class CreateUserSource(Mutation):
     """
     ok = Boolean(description="True if the association creation was successful, False otherwise")
 
-    class Arguments(object):
+    class Arguments:
         """
         Mutation arguments
         """
@@ -55,7 +55,7 @@ class DeleteUserSource(Mutation):
     """
     ok = Boolean(description="True if the association deletion was successful, False otherwise")
 
-    class Arguments(object):
+    class Arguments:
         """
         Mutation arguments
         """

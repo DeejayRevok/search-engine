@@ -42,7 +42,7 @@ class CreateNewspaper(Mutation):
     """
     name = String(description="Name of the created newspaper")
 
-    class Arguments(object):
+    class Arguments:
         """
         Mutation arguments
         """
@@ -91,7 +91,7 @@ class UpdateNewspaper(Mutation):
     """
     name = String(description="Name of the updated newspaper")
 
-    class Arguments(object):
+    class Arguments:
         """
         Mutation arguments
         """
@@ -175,7 +175,7 @@ class DeleteNewspaper(Mutation):
     """
     ok = Boolean()
 
-    class Arguments(object):
+    class Arguments:
         """
         Mutation arguments
         """
