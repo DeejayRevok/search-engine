@@ -5,9 +5,9 @@ from typing import List
 
 from graphene import ObjectType, Field, String, List as GraphList
 from graphql import ResolveInfo
-
 from news_service_lib.graphql import login_required
-from webapp.graph.model import Newspaper, NewspaperFilter
+
+from webapp.graph.model.newspaper import Newspaper, NewspaperFilter
 from models import Newspaper as NewspaperModel
 from webapp.graph.utils.authenticated_filterable_field import AuthenticatedFilterableField
 

@@ -11,8 +11,11 @@ from graphql import ResolveInfo
 from news_service_lib.graphql import login_required
 
 from models import Newspaper as NewspaperModel, NamedEntity as NamedEntityModel, NounChunk as NounChunkModel
-from webapp.graph.model import NewSchema
-from webapp.graph.model.news_search import SearchOperation, SearchField, TrackInfo, SearchTracker
+from webapp.graph.model.new_schema import NewSchema
+from webapp.graph.model.news_search.track_info import TrackInfo
+from webapp.graph.model.news_search.search_operation import SearchOperation
+from webapp.graph.model.news_search.search_field import SearchField
+from webapp.graph.model.news_search.search_tracker_interface import SearchTracker
 
 
 class Newspaper(SQLAlchemyObjectType):

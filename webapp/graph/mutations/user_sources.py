@@ -3,7 +3,6 @@ User source schema mutations
 """
 from graphene import Boolean, String, ObjectType, Mutation
 from graphql import ResolveInfo
-
 from news_service_lib.graphql import login_required
 
 from models import Source as SourceModel

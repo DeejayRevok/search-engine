@@ -5,11 +5,10 @@ from typing import List, Union, Optional
 
 from graphene import Mutation, String, List as GraphList, Boolean, ObjectType
 from graphql import ResolveInfo
-
-from log_config import get_logger
 from news_service_lib.graphql import login_required
 from news_service_lib.storage.sql import SqlSessionProvider
 
+from log_config import get_logger
 from models import Newspaper as NewspaperModel, NamedEntity as NamedEntityModel, NounChunk as NounChunkModel
 from services.crud.crud_service import CRUDService
 from services.crud.named_entity_service import NamedEntityService
