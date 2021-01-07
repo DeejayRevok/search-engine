@@ -32,7 +32,7 @@ class SourceQueries(ObjectType):
         user_id: int = info.context['request'].user['id']
 
         query = UserSource.get_query(info)
-        return [user_source.source for user_source in query.filter(UserSourceModel.id == user_id)]
+        return [user_source.source for user_source in query.filter(UserSourceModel.user_id == user_id)]
 
     @staticmethod
     @login_required
