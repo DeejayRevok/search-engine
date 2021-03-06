@@ -19,6 +19,7 @@ from services.crud.new_service import NewService
 from services.crud.newspaper_service import NewspaperService
 from services.crud.noun_chunk_service import NounChunkService
 from services.crud.source_service import SourceService
+from services.crud.user_new_service import UserNewService
 from services.crud.user_source_service import UserSourceService
 from services.index_service import IndexService
 from services.news_manager_service import NewsManagerService
@@ -69,6 +70,7 @@ def init_search_engine(app: Application) -> Application:
     app['noun_chunks_service'] = NounChunkService(sql_session_provider)
     app['newspaper_service'] = NewspaperService(sql_session_provider)
     app['user_source_service'] = UserSourceService(sql_session_provider)
+    app['user_new_service'] = UserNewService(sql_session_provider)
 
     initialize_apm(app)
 
