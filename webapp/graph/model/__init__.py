@@ -6,6 +6,7 @@ from webapp.graph.model.noun_chunk_schema import NounChunkSchema, NounChunkFilte
 from webapp.graph.model.news_search_schema import NewsSearch
 from webapp.graph.model.newspaper import Newspaper, NewspaperFilter
 from webapp.graph.model.user_source import UserSource
+from webapp.graph.model.user_new import UserNew
 
 __all__ = [
     "NewSchema",
@@ -21,5 +22,6 @@ __all__ = [
     "NewsSearch",
     "Newspaper",
     "NewspaperFilter",
-    "UserSource"
+    "UserSource",
+    "UserNew"
 ]
