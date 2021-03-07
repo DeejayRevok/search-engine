@@ -1,5 +1,5 @@
 """
-User new database model definition module
+New like database model definition module
 """
 from sqlalchemy import Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship, backref
@@ -8,11 +8,11 @@ from models.new import New
 from models.base import BASE
 
 
-class UserNew(BASE):
+class NewLike(BASE):
     """
-    User news relationship model
+    New like relationship model
     """
-    __tablename__ = 'user_new'
+    __tablename__ = 'new_like'
 
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, nullable=False)
@@ -22,4 +22,4 @@ class UserNew(BASE):
     new: New = relationship('New',
                             lazy='select',
                             uselist=False,
-                            backref=backref('user_news', lazy='select'))
+                            backref=backref('likes', lazy='select'))
