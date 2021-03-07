@@ -8,6 +8,7 @@ from models.named_entity_type import NamedEntityType
 from models.noun_chunk import NounChunk
 from models.user_source import UserSource
 from models.user_new import UserNew
+from models.newspaper_follow import NewspaperFollow
 from models.newspaper import Newspaper
 from models.base import BASE
 
@@ -20,5 +21,6 @@ __all__ = [
     "NounChunk",
     "UserSource",
     "UserNew",
+    "NewspaperFollow",
     "Newspaper"
 ]
