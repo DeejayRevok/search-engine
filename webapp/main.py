@@ -15,6 +15,7 @@ from log_config import LOG_CONFIG, get_logger
 from models import BASE
 from services.crud.named_entity_service import NamedEntityService
 from services.crud.named_entity_type_service import NamedEntityTypeService
+from services.crud.new_like_service import NewLikeService
 from services.crud.new_service import NewService
 from services.crud.newspaper_service import NewspaperService
 from services.crud.noun_chunk_service import NounChunkService
@@ -73,6 +74,7 @@ def init_search_engine(app: Application) -> Application:
     app['user_source_service'] = UserSourceService(sql_session_provider)
     app['user_new_service'] = UserNewService(sql_session_provider)
     app['newspaper_follow_service'] = NewspaperFollowService(sql_session_provider)
+    app['new_like_service'] = NewLikeService(sql_session_provider)
 
     initialize_apm(app)
 

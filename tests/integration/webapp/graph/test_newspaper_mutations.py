@@ -1,16 +1,14 @@
 """
 Newspaper mutations tests module
 """
-import nest_asyncio
-nest_asyncio.apply()
-
-import asyncio
 from unittest import TestCase
 
+import asyncio
 from aiohttp.web_app import Application
 from aiounittest import async_test
 from graphene.test import Client
 from graphql.execution.executors.asyncio import AsyncioExecutor
+import nest_asyncio
 
 from news_service_lib.storage.sql import create_sql_engine, SqlEngineType, SqlSessionProvider, init_sql_db
 
@@ -20,6 +18,8 @@ from services.crud.named_entity_type_service import NamedEntityTypeService
 from services.crud.newspaper_service import NewspaperService
 from services.crud.noun_chunk_service import NounChunkService
 from webapp.graph import schema
+
+nest_asyncio.apply()
 
 
 class MockRequest:

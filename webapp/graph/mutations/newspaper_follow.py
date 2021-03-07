@@ -14,7 +14,7 @@ class FollowNewspaper(Mutation):
     """
     Mutation to create a newspaper follow
     """
-    ok = Boolean(description="True if the association creation was successful, False otherwise")
+    ok = Boolean(description="True if the follow creation was successful, False otherwise")
 
     class Arguments:
         """
@@ -56,7 +56,7 @@ class UnfollowNewspaper(Mutation):
     """
     Mutation to delete a newspaper follow
     """
-    ok = Boolean(description="True if the association deletion was successful, False otherwise")
+    ok = Boolean(description="True if the unfollow was successful, False otherwise")
 
     class Arguments:
         """

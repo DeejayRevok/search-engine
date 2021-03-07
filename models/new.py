@@ -4,7 +4,7 @@ New database model definition module
 from sqlalchemy import Column, Integer, String, Float, ForeignKey
 from sqlalchemy.orm import relationship, backref
 
-from models import Source
+from models.source import Source
 from models.base import BASE
 from models.named_entity import news_association as named_entities_association
 from models.noun_chunk import news_association as noun_chunk_association

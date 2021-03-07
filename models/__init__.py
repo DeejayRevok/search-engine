@@ -10,6 +10,7 @@ from models.user_source import UserSource
 from models.user_new import UserNew
 from models.newspaper_follow import NewspaperFollow
 from models.newspaper import Newspaper
+from models.new_like import NewLike
 from models.base import BASE
 
 __all__ = [
@@ -22,5 +23,6 @@ __all__ = [
     "UserSource",
     "UserNew",
     "NewspaperFollow",
-    "Newspaper"
+    "Newspaper",
+    "NewLike"
 ]

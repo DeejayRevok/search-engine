@@ -1,3 +1,4 @@
+from webapp.graph.model.new_like import NewLike
 from webapp.graph.model.new_schema import NewSchema, NewFilter
 from webapp.graph.model.source import Source, SourceFilter
 from webapp.graph.model.named_entity_schema import NamedEntitySchema, NamedEntityFilter
@@ -25,5 +26,6 @@ __all__ = [
     "NewspaperFilter",
     "UserSource",
     "UserNew",
-    "NewspaperFollow"
+    "NewspaperFollow",
+    "NewLike"
 ]
