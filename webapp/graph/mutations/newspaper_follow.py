@@ -42,9 +42,12 @@ class FollowNewspaper(Mutation):
 
         newspaper: NewspaperModel = await newspaper_service.read_one(name=newspaper_name)
         if newspaper:
-            await newspaper_follow_service.save(user_id=user_id, newspaper_id=newspaper.id)
+            if newspaper.user_id != user_id:
+                await newspaper_follow_service.save(user_id=user_id, newspaper_id=newspaper.id)
 
-            return FollowNewspaper(ok=True)
+                return FollowNewspaper(ok=True)
+            else:
+                raise ValueError(f'Impossible to follow your own newspaper')
         else:
             raise ValueError(f'Newspaper {newspaper_name} not found')
 
@@ -59,7 +62,7 @@ class UnfollowNewspaper(Mutation):
         """
         Mutation arguments
         """
-        new_title = String(required=True, description='Name of the newspaper to unfollow')
+        newspaper_name = String(required=True, description='Name of the newspaper to unfollow')
 
     @staticmethod
     @login_required
@@ -81,7 +84,7 @@ class UnfollowNewspaper(Mutation):
 
         newspaper: NewspaperModel = await newspaper_service.read_one(name=newspaper_name)
         if newspaper:
-            newspaper_follow = await newspaper_follow_service.read_one(user_id=user_id, new_id=newspaper.id)
+            newspaper_follow = await newspaper_follow_service.read_one(user_id=user_id, newspaper_id=newspaper.id)
             if newspaper_follow:
                 await newspaper_follow_service.delete(newspaper_follow.id)
                 return UnfollowNewspaper(ok=True)

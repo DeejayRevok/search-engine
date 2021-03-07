@@ -48,7 +48,8 @@ class NewspaperQueries(ObjectType):
         user_id: int = info.context['request'].user['id']
 
         query = NewspaperFollow.get_query(info)
-        return list(query.filter(NewspaperFollowModel.user_id == user_id))
+        return [newspaper_follow.newspaper for newspaper_follow in
+                query.filter(NewspaperFollowModel.user_id == user_id)]
 
     @staticmethod
     @login_required

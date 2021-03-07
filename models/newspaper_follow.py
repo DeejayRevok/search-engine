@@ -4,7 +4,7 @@ Newspaper follow database model definition module
 from sqlalchemy import Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship, backref
 
-from models import Newspaper
+from models.newspaper import Newspaper
 from models.base import BASE
 
 
