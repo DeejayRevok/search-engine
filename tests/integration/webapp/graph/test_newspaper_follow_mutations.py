@@ -1,24 +1,22 @@
 """
 Newspaper follow mutations tests module
 """
-import nest_asyncio
-
-from services.crud.newspaper_follow_service import NewspaperFollowService
-
-nest_asyncio.apply()
-
 from unittest import TestCase
 
 from aiohttp.web_app import Application
 from aiounittest import async_test
 from graphene.test import Client
 from graphql.execution.executors.asyncio import AsyncioExecutor
+import nest_asyncio
 
 from news_service_lib.storage.sql import create_sql_engine, SqlEngineType, SqlSessionProvider, init_sql_db
 
 from models import BASE
 from services.crud.newspaper_service import NewspaperService
+from services.crud.newspaper_follow_service import NewspaperFollowService
 from webapp.graph import schema
+
+nest_asyncio.apply()
 
 
 class MockRequest:
