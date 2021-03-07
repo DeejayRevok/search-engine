@@ -7,6 +7,7 @@ from webapp.graph.model.news_search_schema import NewsSearch
 from webapp.graph.model.newspaper import Newspaper, NewspaperFilter
 from webapp.graph.model.user_source import UserSource
 from webapp.graph.model.user_new import UserNew
+from webapp.graph.model.newspaper_follow import NewspaperFollow
 
 __all__ = [
     "NewSchema",
@@ -23,5 +24,6 @@ __all__ = [
     "Newspaper",
     "NewspaperFilter",
     "UserSource",
-    "UserNew"
+    "UserNew",
+    "NewspaperFollow"
 ]
