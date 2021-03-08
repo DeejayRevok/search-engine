@@ -8,6 +8,7 @@ from models.source import Source
 from models.base import BASE
 from models.named_entity import news_association as named_entities_association
 from models.noun_chunk import news_association as noun_chunk_association
+from models.user import user_news, new_likes
 
 
 class New(BASE):
@@ -35,6 +36,16 @@ class New(BASE):
         "NamedEntity",
         secondary=named_entities_association,
         back_populates="news")
+
+    archived_by = relationship(
+        "User",
+        secondary=user_news,
+        back_populates="news")
+
+    likes = relationship(
+        "User",
+        secondary=new_likes,
+        back_populates="new_likes")
 
     def __iter__(self) -> iter:
         """

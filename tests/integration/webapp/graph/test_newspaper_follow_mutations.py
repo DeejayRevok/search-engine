@@ -13,7 +13,7 @@ from news_service_lib.storage.sql import create_sql_engine, SqlEngineType, SqlSe
 
 from models import BASE
 from services.crud.newspaper_service import NewspaperService
-from services.crud.newspaper_follow_service import NewspaperFollowService
+from services.crud.user_service import UserService
 from webapp.graph import schema
 
 nest_asyncio.apply()
@@ -60,12 +60,12 @@ class TestNewspaperFollowMutations(TestCase):
         init_sql_db(BASE, test_engine)
 
         self.newspaper_service = NewspaperService(session_provider=self.session_provider)
-        self.newspaper_follow_service = NewspaperFollowService(session_provider=self.session_provider)
+        self.user_service = UserService(session_provider=self.session_provider)
 
         app = Application()
         app['session_provider'] = self.session_provider
         app['newspaper_service'] = self.newspaper_service
-        app['newspaper_follow_service'] = self.newspaper_follow_service
+        app['user_service'] = self.user_service
         self.app = app
 
     @async_test
@@ -73,6 +73,8 @@ class TestNewspaperFollowMutations(TestCase):
         """
         Test the follow newspaper mutation stores the follow
         """
+        await self.user_service.save(id=2, username='test2')
+        await self.user_service.save(id=self.USER_ID, username='test')
         await self.newspaper_service.save(name=self.TEST_NEWSPAPER, user_id=2)
         client = Client(schema)
         client.execute(self.FOLLOW_NEWSPAPER_MUTATION,
@@ -82,14 +84,16 @@ class TestNewspaperFollowMutations(TestCase):
                        context_value={'request': MockRequest({'id': self.USER_ID}, self.app)},
                        executor=AsyncioExecutor())
         with self.session_provider():
-            user_newspaper_follows = list(await self.newspaper_follow_service.read_all(user_id=self.USER_ID))
-            self.assertTrue(len(user_newspaper_follows))
+            newspaper = await self.newspaper_service.read_one(name=self.TEST_NEWSPAPER)
+            self.assertTrue(len(newspaper.follows))
 
     @async_test
     async def test_follow_newspaper_same_user(self):
         """
         Test following a newspaper of the same user which requests the follow returns error
         """
+        await self.user_service.save(id=2, username='test2')
+        await self.user_service.save(id=self.USER_ID, username='test')
         await self.newspaper_service.save(name=self.TEST_NEWSPAPER, user_id=self.USER_ID)
         client = Client(schema)
         response = client.execute(self.FOLLOW_NEWSPAPER_MUTATION,
@@ -106,6 +110,7 @@ class TestNewspaperFollowMutations(TestCase):
         """
         Test following an unexisting newspaper returns error
         """
+        await self.user_service.save(id=self.USER_ID, username='test')
         client = Client(schema)
         response = client.execute(self.FOLLOW_NEWSPAPER_MUTATION,
                                   variables={
@@ -121,6 +126,8 @@ class TestNewspaperFollowMutations(TestCase):
         """
         Test unfollowing a newspaper unfollows it
         """
+        await self.user_service.save(id=2, username='test2')
+        await self.user_service.save(id=self.USER_ID, username='test')
         await self.newspaper_service.save(name=self.TEST_NEWSPAPER, user_id=2)
         client = Client(schema)
         executor = AsyncioExecutor()
@@ -131,8 +138,8 @@ class TestNewspaperFollowMutations(TestCase):
                        context_value={'request': MockRequest({'id': self.USER_ID}, self.app)},
                        executor=executor)
         with self.session_provider():
-            user_newspaper_follows = list(await self.newspaper_follow_service.read_all(user_id=self.USER_ID))
-            self.assertTrue(len(user_newspaper_follows))
+            newspaper = await self.newspaper_service.read_one(name=self.TEST_NEWSPAPER)
+            self.assertTrue(len(newspaper.follows))
         client.execute(self.UNFOLLOW_NEWSPAPER_MUTATION,
                        variables={
                            'name': self.TEST_NEWSPAPER
@@ -140,14 +147,16 @@ class TestNewspaperFollowMutations(TestCase):
                        context_value={'request': MockRequest({'id': self.USER_ID}, self.app)},
                        executor=executor)
         with self.session_provider():
-            user_newspaper_follows = list(await self.newspaper_follow_service.read_all(user_id=self.USER_ID))
-            self.assertFalse(len(user_newspaper_follows))
+            newspaper = await self.newspaper_service.read_one(name=self.TEST_NEWSPAPER)
+            self.assertFalse(len(newspaper.follows))
 
     @async_test
     async def test_unfollow_not_followed_newspaper(self):
         """
         Test unfollowing a non followed newspaper returns error
         """
+        await self.user_service.save(id=2, username='test2')
+        await self.user_service.save(id=self.USER_ID, username='test')
         await self.newspaper_service.save(name=self.TEST_NEWSPAPER, user_id=2)
         client = Client(schema)
         executor = AsyncioExecutor()

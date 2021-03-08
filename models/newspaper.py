@@ -2,9 +2,10 @@
 Newspaper database model definition module
 """
 from sqlalchemy import Column, Integer, String, Table, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
 
 from models.base import BASE
+from models.user import User, newspaper_follows
 
 named_entities_association = Table('newspaper_named_entity', BASE.metadata,
                                    Column('newspaper_id', Integer, ForeignKey('newspaper.id', ondelete='CASCADE')),
@@ -24,7 +25,12 @@ class Newspaper(BASE):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(255), unique=True, nullable=False)
-    user_id = Column(Integer, nullable=False)
+    user_id = Column(ForeignKey('user.id'), nullable=False, index=True)
+
+    source: User = relationship('User',
+                                lazy='select',
+                                uselist=False,
+                                backref=backref('newspapers', lazy='select'))
 
     named_entities = relationship("NamedEntity",
                                   secondary=named_entities_association,
@@ -33,6 +39,10 @@ class Newspaper(BASE):
     noun_chunks = relationship("NounChunk",
                                secondary=noun_chunks_association,
                                back_populates="newspapers")
+
+    follows = relationship("User",
+                           secondary=newspaper_follows,
+                           back_populates="newspaper_follows")
 
     def __iter__(self) -> iter:
         """

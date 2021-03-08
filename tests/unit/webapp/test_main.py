@@ -15,6 +15,7 @@ class TestMain(unittest.TestCase):
     """
 
     # noinspection PyTypeHints
+    @patch('webapp.main.setup_event_bus')
     @patch('webapp.main.get_uaa_service')
     @patch('webapp.main.NewsManagerService')
     @patch('webapp.main.IndexService')
@@ -27,7 +28,7 @@ class TestMain(unittest.TestCase):
     @patch('webapp.main.create_sql_engine')
     def test_init_app(self, create_engine_mock, init_sql_mock, sql_health_mock, _,
                       initialize_apm_mock, config_mock, setup_graphql_mock, index_service_mock, news_manager_mock,
-                      get_uaa_service_mock):
+                      get_uaa_service_mock, __):
         """
         Test initializing the app initializes the database the graphql views and all the required services
         """

@@ -14,3 +14,5 @@ graphene-sqlalchemy==2.3.0
 graphene-sqlalchemy-filter==1.12.1
 gql==2.0.0
 nest-asyncio==1.4.3
+lightbus
+alembic

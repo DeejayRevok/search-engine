@@ -7,6 +7,7 @@ from webapp.graph.queries.news import NewQueries
 from webapp.graph.queries.newspapers import NewspaperQueries
 from webapp.graph.queries.noun_chunks import NounChunkQueries
 from webapp.graph.queries.sources import SourceQueries
+from webapp.graph.queries.user import UserQueries
 
 
 class Query(NewQueries,
@@ -14,7 +15,8 @@ class Query(NewQueries,
             NamedEntityQueries,
             NamedEntityTypeQueries,
             NounChunkQueries,
-            NewspaperQueries):
+            NewspaperQueries,
+            UserQueries):
     """
     The main GraphQL query point.
     """

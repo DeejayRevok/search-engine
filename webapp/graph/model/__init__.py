@@ -1,4 +1,3 @@
-from webapp.graph.model.new_like import NewLike
 from webapp.graph.model.new_schema import NewSchema, NewFilter
 from webapp.graph.model.source import Source, SourceFilter
 from webapp.graph.model.named_entity_schema import NamedEntitySchema, NamedEntityFilter
@@ -6,9 +5,7 @@ from webapp.graph.model.named_entity_type import NamedEntityType, NamedEntityTyp
 from webapp.graph.model.noun_chunk_schema import NounChunkSchema, NounChunkFilter
 from webapp.graph.model.news_search_schema import NewsSearch
 from webapp.graph.model.newspaper import Newspaper, NewspaperFilter
-from webapp.graph.model.user_source import UserSource
-from webapp.graph.model.user_new import UserNew
-from webapp.graph.model.newspaper_follow import NewspaperFollow
+from webapp.graph.model.user import User
 
 __all__ = [
     "NewSchema",
@@ -24,8 +21,5 @@ __all__ = [
     "NewsSearch",
     "Newspaper",
     "NewspaperFilter",
-    "UserSource",
-    "UserNew",
-    "NewspaperFollow",
-    "NewLike"
+    "User"
 ]
