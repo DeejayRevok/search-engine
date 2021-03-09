@@ -43,7 +43,7 @@ class TestNewspaperFollowMutations(TestCase):
             '''
 
     UNFOLLOW_NEWSPAPER_MUTATION = '''
-                    mutation FollowNewspaper($name: String!){
+                    mutation UnfollowNewspaper($name: String!){
                         unfollowNewspaper(newspaperName: $name){
                             ok
                         }
@@ -78,7 +78,7 @@ class TestNewspaperFollowMutations(TestCase):
         await self.newspaper_service.save(name=self.TEST_NEWSPAPER, user_id=2)
         client = Client(schema)
         client.execute(self.FOLLOW_NEWSPAPER_MUTATION,
-                       variables={
+                       variable_values={
                          'name': self.TEST_NEWSPAPER
                        },
                        context_value={'request': MockRequest({'id': self.USER_ID}, self.app)},
@@ -97,7 +97,7 @@ class TestNewspaperFollowMutations(TestCase):
         await self.newspaper_service.save(name=self.TEST_NEWSPAPER, user_id=self.USER_ID)
         client = Client(schema)
         response = client.execute(self.FOLLOW_NEWSPAPER_MUTATION,
-                                  variables={
+                                  variable_values={
                                      'name': self.TEST_NEWSPAPER
                                   },
                                   context_value={'request': MockRequest({'id': self.USER_ID}, self.app)},
@@ -113,7 +113,7 @@ class TestNewspaperFollowMutations(TestCase):
         await self.user_service.save(id=self.USER_ID, username='test')
         client = Client(schema)
         response = client.execute(self.FOLLOW_NEWSPAPER_MUTATION,
-                                  variables={
+                                  variable_values={
                                      'name': 'unexisting_newspaper'
                                   },
                                   context_value={'request': MockRequest({'id': self.USER_ID}, self.app)},
@@ -132,7 +132,7 @@ class TestNewspaperFollowMutations(TestCase):
         client = Client(schema)
         executor = AsyncioExecutor()
         client.execute(self.FOLLOW_NEWSPAPER_MUTATION,
-                       variables={
+                       variable_values={
                            'name': self.TEST_NEWSPAPER
                        },
                        context_value={'request': MockRequest({'id': self.USER_ID}, self.app)},
@@ -141,7 +141,7 @@ class TestNewspaperFollowMutations(TestCase):
             newspaper = await self.newspaper_service.read_one(name=self.TEST_NEWSPAPER)
             self.assertTrue(len(newspaper.follows))
         client.execute(self.UNFOLLOW_NEWSPAPER_MUTATION,
-                       variables={
+                       variable_values={
                            'name': self.TEST_NEWSPAPER
                        },
                        context_value={'request': MockRequest({'id': self.USER_ID}, self.app)},
@@ -161,7 +161,7 @@ class TestNewspaperFollowMutations(TestCase):
         client = Client(schema)
         executor = AsyncioExecutor()
         response = client.execute(self.UNFOLLOW_NEWSPAPER_MUTATION,
-                                  variables={
+                                  variable_values={
                                        'name': self.TEST_NEWSPAPER
                                   },
                                   context_value={'request': MockRequest({'id': self.USER_ID}, self.app)},
