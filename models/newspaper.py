@@ -25,12 +25,12 @@ class Newspaper(BASE):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(255), unique=True, nullable=False)
-    user_id = Column(ForeignKey('user.id'), nullable=False, index=True)
+    user_id = Column(ForeignKey('user.id', ondelete='CASCADE'), nullable=False, index=True)
 
-    source: User = relationship('User',
-                                lazy='select',
-                                uselist=False,
-                                backref=backref('newspapers', lazy='select'))
+    user: User = relationship('User',
+                              lazy='select',
+                              uselist=False,
+                              back_populates="newspapers")
 
     named_entities = relationship("NamedEntity",
                                   secondary=named_entities_association,
