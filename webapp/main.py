@@ -15,17 +15,16 @@ from log_config import LOG_CONFIG, get_logger
 from models import BASE
 from services.crud.named_entity_service import NamedEntityService
 from services.crud.named_entity_type_service import NamedEntityTypeService
-from services.crud.new_like_service import NewLikeService
 from services.crud.new_service import NewService
 from services.crud.newspaper_service import NewspaperService
 from services.crud.noun_chunk_service import NounChunkService
 from services.crud.source_service import SourceService
-from services.crud.newspaper_follow_service import NewspaperFollowService
-from services.crud.user_new_service import UserNewService
-from services.crud.user_source_service import UserSourceService
+
+from services.crud.user_service import UserService
 from services.index_service import IndexService
 from services.news_manager_service import NewsManagerService
 from webapp.definitions import API_VERSION, CONFIG_PATH, health_check, ALEMBIC_INI_PATH
+from webapp.event_bus import setup_event_bus
 from webapp.graph import schema
 from webapp.graph.utils.middlewares import SQLMiddleware
 from webapp.middlewares import error_middleware
@@ -51,6 +50,7 @@ def init_search_engine(app: Application) -> Application:
 
     Returns: web application initialized
     """
+
     storage_config = app['config'].get_section('storage')
 
     storage_engine = create_sql_engine(SqlEngineType.MYSQL, **storage_config)
@@ -71,12 +71,11 @@ def init_search_engine(app: Application) -> Application:
     app['named_entity_type_service'] = NamedEntityTypeService(sql_session_provider)
     app['noun_chunks_service'] = NounChunkService(sql_session_provider)
     app['newspaper_service'] = NewspaperService(sql_session_provider)
-    app['user_source_service'] = UserSourceService(sql_session_provider)
-    app['user_new_service'] = UserNewService(sql_session_provider)
-    app['newspaper_follow_service'] = NewspaperFollowService(sql_session_provider)
-    app['new_like_service'] = NewLikeService(sql_session_provider)
+    app['user_service'] = UserService(sql_session_provider)
 
     initialize_apm(app)
+
+    setup_event_bus(app)
 
     app['index_service'] = IndexService(app)
 

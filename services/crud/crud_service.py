@@ -64,10 +64,10 @@ class CRUDService:
                     setattr(entity, property_key, property_value)
                 else:
                     raise ValueError(f'{entity.__class__.__name__} has no property {property_key}')
-            try:
-                return self._repo.save(entity)
-            except StorageError as sterr:
-                raise ValueError(f'Error updating with properties {update_properties}') from sterr
+        try:
+            return self._repo.save(entity)
+        except StorageError as sterr:
+            raise ValueError(f'Error updating with properties {update_properties}') from sterr
 
     @staticmethod
     async def _parse_filters(**filters) -> List[Filter]:
