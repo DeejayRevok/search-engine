@@ -47,9 +47,10 @@ class TestIndexService(TestCase):
     Index service test cases implementation
     """
 
+    @patch('services.index_service.create_sql_engine')
     @patch('services.index_service.Process')
     @patch('services.index_service.ExchangeConsumer')
-    def setUp(self, consumer_mock, process_mock) -> None:
+    def setUp(self, consumer_mock, process_mock, create_engine_mock) -> None:
         self.consumer_mock = consumer_mock
         self.process_mock = process_mock
         self.app = Application()
@@ -63,15 +64,12 @@ class TestIndexService(TestCase):
         init_sql_db(BASE, test_engine)
         self.session_provider = SqlSessionProvider(test_engine)
 
+        create_engine_mock.return_value = test_engine
+
         self.source_service = SourceService(self.session_provider)
         self.news_service = NewService(self.session_provider)
         self.named_entity_service = NamedEntityService(self.session_provider)
         self.named_entity_type_service = NamedEntityTypeService(self.session_provider)
-        self.app['source_service'] = self.source_service
-        self.app['new_service'] = self.news_service
-        self.app['named_entity_service'] = self.named_entity_service
-        self.app['named_entity_type_service'] = self.named_entity_type_service
-        self.app['session_provider'] = self.session_provider
         self.index_service = IndexService(self.app)
 
     def test_initialize_service(self):

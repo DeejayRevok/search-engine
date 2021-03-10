@@ -12,6 +12,7 @@ from aiohttp.web_app import Application
 
 from news_service_lib.models import New, NamedEntity
 from news_service_lib.messaging.exchange_consumer import ExchangeConsumer
+from news_service_lib.storage.sql import create_sql_engine, SqlEngineType, SqlSessionProvider
 
 from log_config import get_logger
 from services.crud.named_entity_service import NamedEntityService
@@ -40,7 +41,16 @@ class IndexService:
             app: application associated
         """
         LOGGER.info('Starting indexing service')
-        self._app = app
+        storage_engine = create_sql_engine(SqlEngineType.MYSQL, **app['config'].get_section('storage'))
+        self._session_provider = SqlSessionProvider(storage_engine)
+        self._source_service = SourceService(self._session_provider)
+        self._new_service = NewService(self._session_provider)
+        self._named_entity_service = NamedEntityService(self._session_provider)
+        self._named_entity_type_service = NamedEntityTypeService(self._session_provider)
+        self._noun_chunk_service = NounChunkService(self._session_provider)
+
+        self._apm = app['apm']
+
         self._exchange_consumer = ExchangeConsumer(**app['config'].get_section('RABBIT'),
                                                    exchange='news',
                                                    queue_name='news-indexing',
@@ -67,10 +77,9 @@ class IndexService:
         Returns: indexed source entity
 
         """
-        source_service: SourceService = self._app['source_service']
-        saved_source: Source = await source_service.read_one(name=source_name)
+        saved_source: Source = await self._source_service.read_one(name=source_name)
         if not saved_source:
-            saved_source = await source_service.save(name=source_name)
+            saved_source = await self._source_service.save(name=source_name)
         return saved_source
 
     async def _index_new(self, new_title: str, new_url: str, new_sentiment: float, source: Source) -> NewModel:
@@ -86,13 +95,12 @@ class IndexService:
         Returns: indexed new
 
         """
-        new_service: NewService = self._app['new_service']
-        saved_new: NewModel = await new_service.read_one(title=new_title)
+        saved_new: NewModel = await self._new_service.read_one(title=new_title)
         if not saved_new:
-            saved_new = await new_service.save(title=new_title, url=new_url, sentiment=new_sentiment,
-                                               source_id=source.id)
+            saved_new = await self._new_service.save(title=new_title, url=new_url, sentiment=new_sentiment,
+                                                     source_id=source.id)
         elif saved_new and saved_new.sentiment != new_sentiment:
-            saved_new = await new_service.update(saved_new, sentiment=new_sentiment)
+            saved_new = await self._new_service.update(saved_new, sentiment=new_sentiment)
         return saved_new
 
     async def _index_named_entities(self, named_entities: List[NamedEntity], entities_saved_new: NewModel):
@@ -115,11 +123,9 @@ class IndexService:
             Returns: indexed named entity type
 
             """
-            named_entity_type_service: NamedEntityTypeService = self._app['named_entity_type_service']
-            saved_named_entity_type: NamedEntityType = await named_entity_type_service.read_one(
-                name=name)
+            saved_named_entity_type: NamedEntityType = await self._named_entity_type_service.read_one(name=name)
             if not saved_named_entity_type:
-                saved_named_entity_type = await named_entity_type_service.save(name=name, description=description)
+                saved_named_entity_type = await self._named_entity_type_service.save(name=name, description=description)
             return saved_named_entity_type
 
         async def _index_named_entity(value: str, named_entity_type: NamedEntityType,
@@ -135,17 +141,19 @@ class IndexService:
             Returns: indexed named entity
 
             """
-            named_entity_service: NamedEntityService = self._app['named_entity_service']
-            saved_named_entity: NamedEntityModel = await named_entity_service.read_one(value=value)
+            saved_named_entity: NamedEntityModel = await self._named_entity_service.read_one(value=value)
             if not saved_named_entity:
-                saved_named_entity = await named_entity_service.save(value=value,
-                                                                     named_entity_type_id=named_entity_type.id)
+                saved_named_entity = await self._named_entity_service.save(value=value,
+                                                                           named_entity_type_id=named_entity_type.id)
             saved_named_entity.news.append(new_model)
             return saved_named_entity
 
         for named_entity in named_entities:
-            named_ent_type = await _index_named_entity_type(named_entity.type)
-            await _index_named_entity(named_entity.text, named_ent_type, entities_saved_new)
+            try:
+                named_ent_type = await _index_named_entity_type(named_entity.type)
+                await _index_named_entity(named_entity.text, named_ent_type, entities_saved_new)
+            except Exception as ex:
+                LOGGER.error('Error while indexing named entity %s: %s', named_entity.text, str(ex), exc_info=True)
 
     async def _index_noun_chunks(self, noun_chunks: List[str], chunks_saved_new: NewModel):
         """
@@ -167,15 +175,17 @@ class IndexService:
             Returns: indexed noun chunk
 
             """
-            noun_chunks_service: NounChunkService = self._app['noun_chunks_service']
-            saved_noun_chunk: NounChunkModel = await noun_chunks_service.read_one(value=value)
+            saved_noun_chunk: NounChunkModel = await self._noun_chunk_service.read_one(value=value)
             if not saved_noun_chunk:
-                saved_noun_chunk = await noun_chunks_service.save(value=value)
+                saved_noun_chunk = await self._noun_chunk_service.save(value=value)
             saved_noun_chunk.news.append(new_model)
             return saved_noun_chunk
 
         for noun_chunk in noun_chunks:
-            await _index_noun_chunk(noun_chunk, chunks_saved_new)
+            try:
+                await _index_noun_chunk(noun_chunk, chunks_saved_new)
+            except Exception as ex:
+                LOGGER.error('Error while indexing noun chunk %s: %s', noun_chunk, str(ex), exc_info=True)
 
     async def index_new(self, new: New) -> NewModel:
         """
@@ -187,7 +197,7 @@ class IndexService:
         Returns: indexed new entity
 
         """
-        with self._app['session_provider'](read_only=False):
+        with self._session_provider(read_only=False):
             if new.source:
                 saved_source_model = await self._index_source(new.source)
 
@@ -210,10 +220,10 @@ class IndexService:
             body: message body with the new data
 
         """
-        LOGGER.info('Indexing new')
-        self._app['apm'].client.begin_transaction('consume')
+        self._apm.client.begin_transaction('consume')
         try:
             body = json.loads(body)
+            LOGGER.info('Indexing new %s', body['title'])
             new = New(title=body['title'],
                       url=body['url'],
                       content=body['content'],
@@ -227,11 +237,11 @@ class IndexService:
 
             asyncio.run(self.index_new(new))
 
-            self._app['apm'].client.end_transaction('New index', 'OK')
+            self._apm.client.end_transaction('New index', 'OK')
         except Exception as ex:
             LOGGER.error('Error while indexing new %s', str(ex), exc_info=True)
-            self._app['apm'].client.end_transaction('New index', 'FAIL')
-            self._app['apm'].client.capture_exception()
+            self._apm.client.end_transaction('New index', 'FAIL')
+            self._apm.client.capture_exception()
 
     async def shutdown(self):
         """
