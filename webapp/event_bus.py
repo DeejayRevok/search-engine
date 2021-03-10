@@ -42,7 +42,9 @@ def setup_event_bus(app: Application):
 
     """
     global bus
-    LOGGER.info('Setting up event bus')
+    redis_url = build_redis_url(**app['config'].get_section('REDIS'))
+
+    LOGGER.info('Starting event bus on %s', redis_url)
     bus = lightbus.create(
         config=dict(
             service_name='search-engine',
@@ -51,7 +53,26 @@ def setup_event_bus(app: Application):
                 schema=dict(
                     transport=dict(
                         redis=dict(
-                            url=build_redis_url(**app['config'].get_section('REDIS'))
+                            url=redis_url
+                        )
+                    )
+                )
+            ),
+            apis=dict(
+                default=dict(
+                    event_transport=dict(
+                        redis=dict(
+                            url=redis_url
+                        )
+                    ),
+                    rpc_transport=dict(
+                        redis=dict(
+                            url=redis_url
+                        )
+                    ),
+                    result_transport=dict(
+                        redis=dict(
+                            url=redis_url
                         )
                     )
                 )
