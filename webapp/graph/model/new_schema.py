@@ -1,7 +1,7 @@
 """
 New models GraphQL module
 """
-from graphene import Node, Field
+from graphene import Node, Field, Boolean
 from graphene_sqlalchemy import SQLAlchemyObjectType
 from graphene_sqlalchemy_filter import FilterSet
 from graphql import ResolveInfo
@@ -26,7 +26,23 @@ class NewSchema(SQLAlchemyObjectType):
         interfaces = (Node,)
         exclude_fields = ('source_id',)
 
+    archived = Boolean(description='New archived by the logged in user')
     detail = Field(NewDetail, description='New detailed information')
+
+    @staticmethod
+    async def resolve_archived(root, info: ResolveInfo) -> bool:
+        """
+        New schema archived field resolver
+
+        Args:
+            root: root new schema instance
+            info: query resolver info
+
+        Returns: True if the current logged user has archived this new, False otherwise
+
+        """
+        user_id: int = info.context['request'].user['id']
+        return any(filter(lambda user: user.id == user_id, root.archived_by))
 
     @staticmethod
     async def resolve_detail(root, info: ResolveInfo) -> dict:
