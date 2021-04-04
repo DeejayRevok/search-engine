@@ -9,11 +9,11 @@ import json
 from typing import List
 
 from aiohttp.web_app import Application
-
 from news_service_lib.models import New, NamedEntity
 from news_service_lib.messaging.exchange_consumer import ExchangeConsumer
 from news_service_lib.storage.sql import create_sql_engine, SqlEngineType, SqlSessionProvider
 
+from config import config
 from log_config import get_logger
 from services.crud.named_entity_service import NamedEntityService
 from services.crud.named_entity_type_service import NamedEntityTypeService
@@ -41,7 +41,7 @@ class IndexService:
             app: application associated
         """
         LOGGER.info('Starting indexing service')
-        storage_engine = create_sql_engine(SqlEngineType.MYSQL, **app['config'].get_section('storage'))
+        storage_engine = create_sql_engine(SqlEngineType.MYSQL, **config.storage)
         self._session_provider = SqlSessionProvider(storage_engine)
         self._source_service = SourceService(self._session_provider)
         self._new_service = NewService(self._session_provider)
@@ -51,7 +51,7 @@ class IndexService:
 
         self._apm = app['apm']
 
-        self._exchange_consumer = ExchangeConsumer(**app['config'].get_section('RABBIT'),
+        self._exchange_consumer = ExchangeConsumer(**config.rabbit,
                                                    exchange='news',
                                                    queue_name='news-indexing',
                                                    message_callback=self.index_message,

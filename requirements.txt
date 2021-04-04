@@ -16,3 +16,4 @@ gql==2.0.0
 nest-asyncio==1.4.3
 lightbus
 alembic
+dynaconf

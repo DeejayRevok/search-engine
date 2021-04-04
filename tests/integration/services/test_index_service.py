@@ -9,6 +9,9 @@ from unittest.mock import patch, MagicMock
 
 from aiohttp.web_app import Application
 from aiounittest import async_test
+from dynaconf.loaders import settings_loader
+
+from config import config
 from news_service_lib.models import New, NamedEntity
 from news_service_lib.storage.sql import create_sql_engine, SqlEngineType, init_sql_db, SqlSessionProvider
 
@@ -18,6 +21,7 @@ from services.crud.named_entity_type_service import NamedEntityTypeService
 from services.crud.new_service import NewService
 from services.crud.source_service import SourceService
 from services.index_service import IndexService
+from tests import TEST_CONFIG_PATH
 
 LOGGER = getLogger()
 
@@ -46,6 +50,12 @@ class TestIndexService(TestCase):
     """
     Index service test cases implementation
     """
+    @classmethod
+    def setUpClass(cls) -> None:
+        """
+        Set up test case environment
+        """
+        settings_loader(config, filename=TEST_CONFIG_PATH)
 
     @patch('services.index_service.create_sql_engine')
     @patch('services.index_service.Process')

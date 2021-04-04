@@ -6,11 +6,10 @@ from multiprocessing import Process
 from typing import Optional
 
 import lightbus
-from aiohttp.web_app import Application
-
 from news_service_lib.events.user_events import UserEvents
 from news_service_lib.redis_utils import build_redis_url, redis_health_check
 
+from config import config
 from log_config import get_logger
 from webapp.event_listeners.user_created_listener import UserCreatedListener
 from webapp.event_listeners.user_deleted_listener import UserDeletedListener
@@ -34,16 +33,13 @@ def event_bus_runner(bus_worker: lightbus.BusPath):
         bus_worker.client.stop_loop()
 
 
-def setup_event_bus(app: Application):
+def setup_event_bus():
     """
     Setup the event bus with the provided application data
 
-    Args:
-        app: base web application
-
     """
     global bus
-    redis_url = build_redis_url(**app['config'].get_section('REDIS'))
+    redis_url = build_redis_url(**config.redis)
 
     if redis_health_check(redis_url):
         LOGGER.info('Starting event bus on %s', redis_url)
@@ -86,11 +82,11 @@ def setup_event_bus(app: Application):
         UserCreatedListener(name='handle_user_creation',
                             event_api='user',
                             event_name='user_created',
-                            storage_config=app['config'].get_section('storage')).add_to_bus(bus)
+                            storage_config=config.storage).add_to_bus(bus)
         UserDeletedListener(name='handle_user_deletion',
                             event_api='user',
                             event_name='user_deleted',
-                            storage_config=app['config'].get_section('storage')).add_to_bus(bus)
+                            storage_config=config.storage).add_to_bus(bus)
 
         p = Process(target=event_bus_runner, args=(bus,))
         p.start()
