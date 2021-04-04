@@ -5,7 +5,10 @@ import unittest
 from unittest.mock import patch
 
 from aiohttp.web_app import Application
-from news_service_lib.config import Configuration
+from dynaconf.loaders import settings_loader
+
+from config import config
+from tests import TEST_CONFIG_PATH
 from webapp.main import init_search_engine
 
 
@@ -20,21 +23,20 @@ class TestMain(unittest.TestCase):
     @patch('webapp.main.NewsManagerService')
     @patch('webapp.main.IndexService')
     @patch('webapp.main.setup_graphql_routes')
-    @patch.object(Configuration, 'get')
     @patch('webapp.main.initialize_apm')
     @patch('webapp.main.SqlSessionProvider')
     @patch('webapp.main.sql_health_check')
     @patch('webapp.main.init_sql_db')
     @patch('webapp.main.create_sql_engine')
     def test_init_app(self, create_engine_mock, init_sql_mock, sql_health_mock, _,
-                      initialize_apm_mock, config_mock, setup_graphql_mock, index_service_mock, news_manager_mock,
+                      initialize_apm_mock, setup_graphql_mock, index_service_mock, news_manager_mock,
                       get_uaa_service_mock, __):
         """
         Test initializing the app initializes the database the graphql views and all the required services
         """
+        settings_loader(config, filename=TEST_CONFIG_PATH)
         sql_health_mock().return_value = True
         base_app = Application()
-        base_app['config'] = config_mock
         app = init_search_engine(base_app)
 
         self.assertIsNotNone(app['session_provider'])
