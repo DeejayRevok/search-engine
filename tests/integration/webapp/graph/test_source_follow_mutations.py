@@ -14,6 +14,7 @@ from news_service_lib.storage.sql import create_sql_engine, SqlEngineType, SqlSe
 from models import BASE
 from services.crud.source_service import SourceService
 from services.crud.user_service import UserService
+from webapp.container_config import container
 from webapp.graph import schema
 
 nest_asyncio.apply()
@@ -54,6 +55,7 @@ class TestNewLikeMutations(TestCase):
         """
         Set up the test environment creating the database engine
         """
+        container.reset()
         test_engine = create_sql_engine(SqlEngineType.SQLITE)
         self.session_provider = SqlSessionProvider(test_engine)
         BASE.query = self.session_provider.query_property
@@ -63,9 +65,9 @@ class TestNewLikeMutations(TestCase):
         self.source_service = SourceService(session_provider=self.session_provider)
 
         app = Application()
-        app['session_provider'] = self.session_provider
-        app['source_service'] = self.source_service
-        app['user_service'] = self.user_service
+        container.set('session_provider', self.session_provider)
+        container.set('source_service', self.source_service)
+        container.set('user_service', self.user_service)
         self.app = app
 
     @async_test

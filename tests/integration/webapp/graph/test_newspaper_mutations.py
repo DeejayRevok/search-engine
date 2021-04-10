@@ -17,6 +17,7 @@ from services.crud.named_entity_service import NamedEntityService
 from services.crud.named_entity_type_service import NamedEntityTypeService
 from services.crud.newspaper_service import NewspaperService
 from services.crud.noun_chunk_service import NounChunkService
+from webapp.container_config import container
 from webapp.graph import schema
 
 nest_asyncio.apply()
@@ -71,6 +72,7 @@ class TestNewspaperMutations(TestCase):
         """
         Set up the test environment creating the database engine
         """
+        container.reset()
         test_engine = create_sql_engine(SqlEngineType.SQLITE)
         self.session_provider = SqlSessionProvider(test_engine)
         BASE.query = self.session_provider.query_property
@@ -90,10 +92,10 @@ class TestNewspaperMutations(TestCase):
         self.newspaper_service = NewspaperService(session_provider=self.session_provider)
 
         app = Application()
-        app['session_provider'] = self.session_provider
-        app['named_entity_service'] = named_entity_service
-        app['noun_chunks_service'] = noun_chunks_service
-        app['newspaper_service'] = self.newspaper_service
+        container.set('session_provider', self.session_provider)
+        container.set('named_entity_service', named_entity_service)
+        container.set('noun_chunk_service', noun_chunks_service)
+        container.set('newspaper_service', self.newspaper_service)
         self.app = app
 
     @async_test

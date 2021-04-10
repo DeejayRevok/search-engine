@@ -3,7 +3,6 @@ User mutations module
 """
 from graphene import Boolean, String, ObjectType, Mutation
 from graphql import ResolveInfo
-
 from news_service_lib.graphql import login_required
 
 from models import New as NewModel, User as UserModel, Newspaper as NewspaperModel, Source as SourceModel
@@ -11,6 +10,7 @@ from services.crud.new_service import NewService
 from services.crud.newspaper_service import NewspaperService
 from services.crud.source_service import SourceService
 from services.crud.user_service import UserService
+from webapp.container_config import container
 
 
 class LikeNew(Mutation):
@@ -40,10 +40,10 @@ class LikeNew(Mutation):
         """
         user_id: int = info.context['request'].user['id']
 
-        new_service: NewService = info.context['request'].app['new_service']
-        user_service: UserService = info.context['request'].app['user_service']
+        new_service: NewService = container.get('new_service')
+        user_service: UserService = container.get('user_service')
 
-        with info.context['request'].app['session_provider'](read_only=False):
+        with container.get('session_provider')(read_only=False):
             new: NewModel = await new_service.read_one(title=new_title)
             if new:
                 user: UserModel = await user_service.read_one(id=user_id)
@@ -82,10 +82,10 @@ class DeleteNewLike(Mutation):
         """
         user_id: int = info.context['request'].user['id']
 
-        new_service: NewService = info.context['request'].app['new_service']
-        user_service: UserService = info.context['request'].app['user_service']
+        new_service: NewService = container.get('new_service')
+        user_service: UserService = container.get('user_service')
 
-        with info.context['request'].app['session_provider'](read_only=False):
+        with container.get('session_provider')(read_only=False):
             new: NewModel = await new_service.read_one(title=new_title)
             if new:
                 user: UserModel = await user_service.read_one(id=user_id)
@@ -126,10 +126,10 @@ class FollowNewspaper(Mutation):
         """
         user_id: int = info.context['request'].user['id']
 
-        newspaper_service: NewspaperService = info.context['request'].app['newspaper_service']
-        user_service: UserService = info.context['request'].app['user_service']
+        newspaper_service: NewspaperService = container.get('newspaper_service')
+        user_service: UserService = container.get('user_service')
 
-        with info.context['request'].app['session_provider'](read_only=False):
+        with container.get('session_provider')(read_only=False):
             newspaper: NewspaperModel = await newspaper_service.read_one(name=newspaper_name)
             if newspaper:
                 user: UserModel = await user_service.read_one(id=user_id)
@@ -171,10 +171,10 @@ class UnfollowNewspaper(Mutation):
         """
         user_id: int = info.context['request'].user['id']
 
-        newspaper_service: NewspaperService = info.context['request'].app['newspaper_service']
-        user_service: UserService = info.context['request'].app['user_service']
+        newspaper_service: NewspaperService = container.get('newspaper_service')
+        user_service: UserService = container.get('user_service')
 
-        with info.context['request'].app['session_provider'](read_only=False):
+        with container.get('session_provider')(read_only=False):
             newspaper: NewspaperModel = await newspaper_service.read_one(name=newspaper_name)
             if newspaper:
                 user: UserModel = await user_service.read_one(id=user_id)
@@ -215,10 +215,10 @@ class FollowSource(Mutation):
         """
         user_id: int = info.context['request'].user['id']
 
-        source_service: SourceService = info.context['request'].app['source_service']
-        user_service: UserService = info.context['request'].app['user_service']
+        source_service: SourceService = container.get('source_service')
+        user_service: UserService = container.get('user_service')
 
-        with info.context['request'].app['session_provider'](read_only=False):
+        with container.get('session_provider')(read_only=False):
             source: SourceModel = await source_service.read_one(name=source_name)
             if source:
                 user: UserModel = await user_service.read_one(id=user_id)
@@ -257,10 +257,10 @@ class UnfollowSource(Mutation):
         """
         user_id: int = info.context['request'].user['id']
 
-        source_service: SourceService = info.context['request'].app['source_service']
-        user_service: UserService = info.context['request'].app['user_service']
+        source_service: SourceService = container.get('source_service')
+        user_service: UserService = container.get('user_service')
 
-        with info.context['request'].app['session_provider'](read_only=False):
+        with container.get('session_provider')(read_only=False):
             source: SourceModel = await source_service.read_one(name=source_name)
             if source:
                 user: UserModel = await user_service.read_one(id=user_id)
@@ -301,10 +301,10 @@ class CreateUserNew(Mutation):
         """
         user_id: int = info.context['request'].user['id']
 
-        new_service: NewService = info.context['request'].app['new_service']
-        user_service: UserService = info.context['request'].app['user_service']
+        new_service: NewService = container.get('new_service')
+        user_service: UserService = container.get('user_service')
 
-        with info.context['request'].app['session_provider'](read_only=False):
+        with container.get('session_provider')(read_only=False):
             new: NewModel = await new_service.read_one(title=new_title)
             if new:
                 user: UserModel = await user_service.read_one(id=user_id)
@@ -343,10 +343,10 @@ class DeleteUserNew(Mutation):
         """
         user_id: int = info.context['request'].user['id']
 
-        new_service: NewService = info.context['request'].app['new_service']
-        user_service: UserService = info.context['request'].app['user_service']
+        new_service: NewService = container.get('new_service')
+        user_service: UserService = container.get('user_service')
 
-        with info.context['request'].app['session_provider'](read_only=False):
+        with container.get('session_provider')(read_only=False):
             new: NewModel = await new_service.read_one(title=new_title)
             if new:
                 user: UserModel = await user_service.read_one(id=user_id)

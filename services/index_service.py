@@ -8,7 +8,8 @@ from multiprocessing import Process
 import json
 from typing import List
 
-from aiohttp.web_app import Application
+from dacite import from_dict
+
 from news_service_lib.models import New, NamedEntity
 from news_service_lib.messaging.exchange_consumer import ExchangeConsumer
 from news_service_lib.storage.sql import create_sql_engine, SqlEngineType, SqlSessionProvider
@@ -24,6 +25,7 @@ from models import Source, NamedEntityType
 from models import New as NewModel
 from models import NamedEntity as NamedEntityModel
 from models import NounChunk as NounChunkModel
+from webapp.container_config import container
 
 LOGGER = get_logger()
 
@@ -33,12 +35,9 @@ class IndexService:
     Index service implementation
     """
 
-    def __init__(self, app: Application):
+    def __init__(self):
         """
-        Initialize the indexing service for the specified app
-
-        Args:
-            app: application associated
+        Initialize the indexing service
         """
         LOGGER.info('Starting indexing service')
         storage_engine = create_sql_engine(SqlEngineType.MYSQL, **config.storage)
@@ -48,8 +47,6 @@ class IndexService:
         self._named_entity_service = NamedEntityService(self._session_provider)
         self._named_entity_type_service = NamedEntityTypeService(self._session_provider)
         self._noun_chunk_service = NounChunkService(self._session_provider)
-
-        self._apm = app['apm']
 
         self._exchange_consumer = ExchangeConsumer(**config.rabbit,
                                                    exchange='news',
@@ -220,28 +217,19 @@ class IndexService:
             body: message body with the new data
 
         """
-        self._apm.client.begin_transaction('consume')
+        apm = container.get('apm')
+        apm.begin_transaction('consume')
         try:
             body = json.loads(body)
             LOGGER.info('Indexing new %s', body['title'])
-            new = New(title=body['title'],
-                      url=body['url'],
-                      content=body['content'],
-                      source=body['source'],
-                      date=body['date'],
-                      hydrated=body['hydrated'],
-                      summary=body['summary'],
-                      sentiment=body['sentiment'],
-                      entities=[NamedEntity(**entity) for entity in body['entities']],
-                      noun_chunks=body['noun_chunks'])
-
+            new = from_dict(New, body)
             asyncio.run(self.index_new(new))
 
-            self._apm.client.end_transaction('New index', 'OK')
+            apm.end_transaction('New index', 'OK')
         except Exception as ex:
             LOGGER.error('Error while indexing new %s', str(ex), exc_info=True)
-            self._apm.client.end_transaction('New index', 'FAIL')
-            self._apm.client.capture_exception()
+            apm.end_transaction('New index', 'FAIL')
+            apm.capture_exception()
 
     async def shutdown(self):
         """
