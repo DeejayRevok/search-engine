@@ -5,11 +5,12 @@ from graphene import Node, Field, Boolean
 from graphene_sqlalchemy import SQLAlchemyObjectType
 from graphene_sqlalchemy_filter import FilterSet
 from graphql import ResolveInfo
-
-from log_config import get_logger
 from news_service_lib.graphql.model import New as NewDetail
 
+from log_config import get_logger
 from models import New as NewModel
+from services.news_manager_service import NewsManagerService
+from webapp.container_config import container
 
 LOGGER = get_logger()
 
@@ -45,20 +46,19 @@ class NewSchema(SQLAlchemyObjectType):
         return any(filter(lambda user: user.id == user_id, root.archived_by))
 
     @staticmethod
-    async def resolve_detail(root, info: ResolveInfo) -> dict:
+    async def resolve_detail(root, _) -> dict:
         """
         New schema detail field resolver
 
         Args:
             root: root new schema instance
-            info: query resolver info
 
         Returns: root new detail
 
         """
         LOGGER.info('Resolving new detail')
-        app = info.context['request'].app
-        return await app['news_manager_service'].get_new_by_title(root.title)
+        news_manager_service: NewsManagerService = container.get('news_manager_service')
+        return await news_manager_service.get_new_by_title(root.title)
 
 
 class NewFilter(FilterSet):

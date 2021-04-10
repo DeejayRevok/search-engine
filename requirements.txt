@@ -17,3 +17,6 @@ nest-asyncio==1.4.3
 lightbus
 alembic
 dynaconf
+elastic-apm==6.0.0
+pypendency==0.1.0
+dacite==1.6.0

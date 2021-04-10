@@ -2,11 +2,11 @@
 CRUD service tests module
 """
 from unittest import TestCase
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, Mock
 
 from aiounittest import async_test
-
 from news_service_lib.storage import StorageError
+from news_service_lib.storage.implementation import Storage
 from services.crud.crud_service import CRUDService
 
 
@@ -20,7 +20,7 @@ class TestCRUDService(TestCase):
         self.test_entity = MagicMock()
         self.test_entity.return_value = self.test_entity_instance
         CRUDService.entity_class = self.test_entity
-        self._repo_mock = MagicMock()
+        self._repo_mock = Mock(spec=Storage)
         factory_mock.return_value = self._repo_mock
         self.test_crud_service = CRUDService(MagicMock())
 

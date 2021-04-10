@@ -3,21 +3,18 @@ UAA webapp definitions module
 """
 from os.path import join, dirname
 
-from aiohttp.web_app import Application
 from news_service_lib.storage.sql import sql_health_check
+from webapp.container_config import container
 
 API_VERSION = 'v1'
 ALEMBIC_INI_PATH = join(dirname(dirname(__file__, )), 'alembic.ini')
 
 
-async def health_check(app: Application) -> bool:
+async def health_check() -> bool:
     """
     Check the health status of the application
-
-    Args:
-        app: application to check health
 
     Returns: True if the status is OK, False otherwise
 
     """
-    return sql_health_check(app['storage_engine'])
+    return sql_health_check(container.get('storage_engine'))

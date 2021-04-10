@@ -3,13 +3,15 @@ Index service tests module
 """
 import json
 import platform
+from dataclasses import asdict
 from logging import getLogger
 from unittest import TestCase
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, Mock
 
 from aiohttp.web_app import Application
 from aiounittest import async_test
 from dynaconf.loaders import settings_loader
+from elasticapm import Client
 
 from config import config
 from news_service_lib.models import New, NamedEntity
@@ -22,6 +24,7 @@ from services.crud.new_service import NewService
 from services.crud.source_service import SourceService
 from services.index_service import IndexService
 from tests import TEST_CONFIG_PATH
+from webapp.container_config import container
 
 LOGGER = getLogger()
 
@@ -61,14 +64,13 @@ class TestIndexService(TestCase):
     @patch('services.index_service.Process')
     @patch('services.index_service.ExchangeConsumer')
     def setUp(self, consumer_mock, process_mock, create_engine_mock) -> None:
+        container.reset()
+
+        self.apm_mock = Mock(spec=Client)
+        container.set('apm', self.apm_mock)
         self.consumer_mock = consumer_mock
         self.process_mock = process_mock
         self.app = Application()
-        self.app['config'] = MagicMock()
-
-        self.apm_mock = MagicMock()
-        self.app['apm'] = MagicMock()
-        self.app['apm'].client = self.apm_mock
 
         test_engine = create_sql_engine(SqlEngineType.SQLITE)
         init_sql_db(BASE, test_engine)
@@ -80,7 +82,7 @@ class TestIndexService(TestCase):
         self.news_service = NewService(self.session_provider)
         self.named_entity_service = NamedEntityService(self.session_provider)
         self.named_entity_type_service = NamedEntityTypeService(self.session_provider)
-        self.index_service = IndexService(self.app)
+        self.index_service = IndexService()
 
     def test_initialize_service(self):
         """
@@ -152,8 +154,8 @@ class TestIndexService(TestCase):
             nonlocal index_new_mock_calls
             index_new_mock_calls += 1
 
-        new_msg_1 = json.dumps(dict(TEST_NEW))
-        new_msg_2 = json.dumps(dict(TEST_NEW_2))
+        new_msg_1 = json.dumps(asdict(TEST_NEW))
+        new_msg_2 = json.dumps(asdict(TEST_NEW_2))
 
         self.index_service.index_new = index_new_mock_async
 
@@ -173,7 +175,7 @@ class TestIndexService(TestCase):
 
         self.index_service.index_new = index_new_mock_async
 
-        new_msg_1 = json.dumps(dict(TEST_NEW))
+        new_msg_1 = json.dumps(asdict(TEST_NEW))
         self.index_service.index_message(None, None, None, new_msg_1)
 
         self.assertEqual(self.apm_mock.end_transaction.call_count, 1)

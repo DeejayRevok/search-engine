@@ -4,7 +4,6 @@ Newspapers mutations module
 from typing import List, Union, Optional
 
 from graphene import Mutation, String, List as GraphList, Boolean, ObjectType
-from graphql import ResolveInfo
 from news_service_lib.graphql import login_required
 from news_service_lib.storage.sql import SqlSessionProvider
 
@@ -14,6 +13,7 @@ from services.crud.crud_service import CRUDService
 from services.crud.named_entity_service import NamedEntityService
 from services.crud.newspaper_service import NewspaperService
 from services.crud.noun_chunk_service import NounChunkService
+from webapp.container_config import container
 
 LOGGER = get_logger()
 
@@ -60,25 +60,25 @@ class CreateNewspaper(Mutation):
             info: mutation resolving info
             name: newspaper name
             named_entities: newspaper named entities
-            noun_chunks: nespaper noun chunks
+            noun_chunks: newspaper noun chunks
 
         Returns: create mutation
 
         """
         user_id: int = info.context['request'].user['id']
 
-        session_provider: SqlSessionProvider = info.context['request'].app['session_provider']
-        newspaper_service: NewspaperService = info.context['request'].app['newspaper_service']
+        session_provider: SqlSessionProvider = container.get('session_provider')
+        newspaper_service: NewspaperService = container.get('newspaper_service')
 
         with session_provider(read_only=False):
             newspaper: NewspaperModel = await newspaper_service.save(name=name, user_id=user_id)
 
             if named_entities:
-                named_entity_service: NamedEntityService = info.context['request'].app['named_entity_service']
+                named_entity_service: NamedEntityService = container.get('named_entity_service')
                 for named_entity_val in named_entities:
                     await _associate(named_entity_service, named_entity_val, newspaper)
             if noun_chunks:
-                noun_chunks_service: NounChunkService = info.context['request'].app['noun_chunks_service']
+                noun_chunks_service: NounChunkService = container.get('noun_chunk_service')
                 for noun_chunk_val in noun_chunks:
                     await _associate(noun_chunks_service, noun_chunk_val, newspaper)
 
@@ -101,21 +101,20 @@ class UpdateNewspaper(Mutation):
         noun_chunks = GraphList(String, required=False, description="Newspaper updated noun chunks")
 
     @staticmethod
-    async def _update_association(info: ResolveInfo, association_entities: Optional[List[str]],
-                                  association_service_name: str, newspaper: NewspaperModel, newspaper_assocation: List):
+    async def _update_association(association_entities: Optional[List[str]],
+                                  association_service: CRUDService, newspaper: NewspaperModel,
+                                  newspaper_assocation: List):
         """
         Update the newspaper association with the input data
 
         Args:
-            info: mutation resolver info
             association_entities: association entities to update
-            association_service_name: name of the service to use for the association
+            association_service: service used to create the association
             newspaper: newspaper to update
             newspaper_assocation: newspaper association container
 
         """
         if association_entities is not None:
-            association_service: CRUDService = info.context['request'].app[association_service_name]
             delete_associations = list()
             for association in newspaper_assocation:
                 if association.value not in association_entities:
@@ -131,13 +130,12 @@ class UpdateNewspaper(Mutation):
 
     @staticmethod
     @login_required
-    async def mutate(_, info, original_name: str, update_name: str = None, named_entities: List[str] = None,
+    async def mutate(_, __, original_name: str, update_name: str = None, named_entities: List[str] = None,
                      noun_chunks: List[str] = None):
         """
         Mutation handler
 
         Args:
-            info: resolve information
             original_name: name of the newspaper to update
             update_name: new newspaper name
             named_entities: newspaper new named entities
@@ -147,8 +145,8 @@ class UpdateNewspaper(Mutation):
 
         """
         if original_name and (update_name is not None or named_entities is not None or noun_chunks is not None):
-            session_provider: SqlSessionProvider = info.context['request'].app['session_provider']
-            newspaper_service: NewspaperService = info.context['request'].app['newspaper_service']
+            session_provider: SqlSessionProvider = container.get('session_provider')
+            newspaper_service: NewspaperService = container.get('newspaper_service')
 
             with session_provider(read_only=False):
                 newspaper: NewspaperModel = await newspaper_service.read_one(name=original_name)
@@ -156,10 +154,12 @@ class UpdateNewspaper(Mutation):
                     if update_name:
                         newspaper.name = update_name
 
-                    await UpdateNewspaper._update_association(info, named_entities, 'named_entity_service', newspaper,
+                    named_entity_service = container.get('named_entity_service')
+                    await UpdateNewspaper._update_association(named_entities, named_entity_service, newspaper,
                                                               newspaper.named_entities)
 
-                    await UpdateNewspaper._update_association(info, noun_chunks, 'noun_chunks_service', newspaper,
+                    noun_chunks_service: NounChunkService = container.get('noun_chunk_service')
+                    await UpdateNewspaper._update_association(noun_chunks, noun_chunks_service, newspaper,
                                                               newspaper.noun_chunks)
                 else:
                     raise ValueError(f'Newspaper {original_name} not found')
@@ -183,18 +183,17 @@ class DeleteNewspaper(Mutation):
 
     @staticmethod
     @login_required
-    async def mutate(_, info: ResolveInfo, name: str):
+    async def mutate(_, __, name: str):
         """
         Mutation handler
 
         Args:
-            info: Resolve information
             name: Name of the newspaper to delete
 
         Returns: mutation
 
         """
-        newspaper_service: NewspaperService = info.context['request'].app['newspaper_service']
+        newspaper_service: NewspaperService = container.get('newspaper_service')
 
         delete_newspaper: NewspaperModel = await newspaper_service.read_one(name=name)
         if delete_newspaper:
