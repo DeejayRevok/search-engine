@@ -39,20 +39,21 @@ def init_search_engine(app: Application) -> Application:
     Returns: web application initialized
     """
     load()
-    container.get('index_service')
-    setup_event_bus()
     ElasticAPM(app, container.get('apm'))
 
     storage_engine = container.get('storage_engine')
-    init_sql_db(BASE, storage_engine, alembic_ini_path=ALEMBIC_INI_PATH)
-
     if not sql_health_check(storage_engine):
         sys.exit(1)
+
+    init_sql_db(BASE, storage_engine, alembic_ini_path=ALEMBIC_INI_PATH)
 
     session_provider = container.get('session_provider')
     BASE.query = session_provider.query_property
 
     HealthCheck(app, health_check)
+
+    container.get('index_service')
+    setup_event_bus()
 
     setup_graphql_routes(app, schema, get_logger(), middlewares=[SQLMiddleware(session_provider)])
     index_views.setup_routes(app)
