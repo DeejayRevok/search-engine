@@ -1,0 +1,8 @@
+name: search-engine
+description: A generated Helm Chart for search-engine from Skippbox Kompose
+version: 0.0.1
+apiVersion: v1
+keywords:
+  - search-engine
+sources:
+home:
