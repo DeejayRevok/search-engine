@@ -8,9 +8,10 @@ spec:
   rules:
     - http:
         paths:
-          - path: /search/?(.*)
-              backend:
-                service:
-                  name: search-engine
-                  port:
-                    number: 8083
+        - path: /search/?(.*)
+          pathType: Prefix
+          backend:
+            service:
+              name: search-engine
+              port:
+                number: 8083

@@ -68,4 +68,5 @@ def init_search_engine(app: Application) -> Application:
 
 
 if __name__ == '__main__':
-    server_runner('Search Engine', init_search_engine, API_VERSION, CONFIGS_PATH, config, LOG_CONFIG, get_logger)
+    server_runner('Search Engine', init_search_engine, API_VERSION, CONFIGS_PATH, config, 'SEARCH_ENGINE', LOG_CONFIG,
+                  get_logger)
