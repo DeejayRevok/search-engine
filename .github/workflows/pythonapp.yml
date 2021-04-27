@@ -1,6 +1,9 @@
 name: Search Engine Service
 
-on: [push]
+on:
+  push:
+    branches-ignore:
+      - master
 
 jobs:
 
