@@ -1,0 +1,16 @@
+name: search-engine
+description: Search engine helm chart
+version: 0.0.0
+appVersion: latest
+apiVersion: v1
+keywords:
+  - search-engine
+sources:
+home:
+dependencies:
+  - name: rabbit
+    version: 0.1.0
+    repository: "https://deejayrevok.github.io/helm-repo"
+  - name: redis
+    version: 0.1.0
+    repository: "https://deejayrevok.github.io/helm-repo"

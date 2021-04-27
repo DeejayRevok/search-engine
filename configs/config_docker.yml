@@ -1,0 +1,34 @@
+server:
+  host: 0.0.0.0
+  port: 8083
+storage:
+  host: mysql-search-engine
+  port: 3306
+  user: app-us3r
+  password: n3wsp4ssw0rd
+  database: search-engine
+elastic_apm:
+  service_name: search-engine
+  secret_token: xxVpmQB2HMzCL9PgBHVrnxjNXXw5J7bd79DFm6sjBJR5HPXDhcF8MSb3vv4bpg44
+  url: http://apm-server:8200
+logstash:
+  host: logstash
+  port: 5000
+rabbit:
+  host: rabbitmq
+  port: 5672
+  user: guest
+  password: guest
+uaa:
+  protocol: http
+  host: uaa
+  port: 8081
+news_manager:
+  protocol: http
+  host: news-manager
+  port: 8080
+redis:
+  host: redis
+  port: 6379
+  password: n3wsr3d1sp4ss
+  db: 1
