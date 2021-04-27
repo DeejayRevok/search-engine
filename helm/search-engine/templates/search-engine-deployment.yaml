@@ -22,7 +22,7 @@ spec:
       - envFrom:
           - configMapRef:
               name: search-engine-configmap
-        image: djrevok/search-engine:latest
+        image: 'djrevok/search-engine:{{ .Chart.AppVersion }}'
         name: search-engine
         ports:
         - containerPort: 8083
