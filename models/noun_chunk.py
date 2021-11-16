@@ -1,6 +1,3 @@
-"""
-Noun chunk database model definition module
-"""
 from sqlalchemy import Column, Integer, String, Table, ForeignKey
 from sqlalchemy.orm import relationship
 
@@ -13,9 +10,6 @@ news_association = Table('new_noun_chunk', BASE.metadata,
 
 
 class NounChunk(BASE):
-    """
-    Noun chunk model
-    """
     __tablename__ = 'noun_chunk'
 
     id = Column(Integer, primary_key=True)
@@ -32,10 +26,4 @@ class NounChunk(BASE):
         back_populates="noun_chunks")
 
     def __iter__(self) -> iter:
-        """
-        Iterate over the model properties
-
-        Returns: iterator to the model properties
-
-        """
         yield 'value', self.value

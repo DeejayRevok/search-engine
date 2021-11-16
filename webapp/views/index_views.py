@@ -1,6 +1,3 @@
-"""
-Index views module
-"""
 from aiohttp.web_app import Application
 from aiohttp.web_exceptions import HTTPBadRequest
 from aiohttp.web_request import Request
@@ -23,10 +20,6 @@ ROUTES = ClassRouteTableDef()
 
 
 class IndexViews:
-    """
-    Index REST endpoint views handler
-    """
-
     @docs(
         tags=['Indexing'],
         summary="Index",
@@ -36,16 +29,6 @@ class IndexViews:
     @request_schema(PostIndexSchema)
     @ROUTES.post(f'/{API_VERSION}{ROOT_PATH}')
     async def index_new(self, request: Request) -> Response:
-        """
-        Request to index new
-
-        Args:
-            request: input REST request
-
-        Returns: json REST response with the indexed new title
-
-        """
-
         @login_required
         async def request_executor(inner_request):
             LOGGER.info('REST request to index new')
@@ -64,13 +47,6 @@ class IndexViews:
 
 
 def setup_routes(app: Application):
-    """
-    Add the class routes to the specified application
-
-    Args:
-        app: application to add routes
-
-    """
     ROUTES.clean_routes()
     ROUTES.add_class_routes(IndexViews())
     app.router.add_routes(ROUTES)

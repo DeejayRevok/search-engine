@@ -1,6 +1,3 @@
-"""
-User view database model definition module
-"""
 from sqlalchemy import Column, Integer, String, Table, ForeignKey
 from sqlalchemy.orm import relationship, backref
 
@@ -24,9 +21,6 @@ source_follows = Table('source_follow', BASE.metadata,
 
 
 class User(BASE):
-    """
-    User view database model
-    """
     __tablename__ = 'user'
 
     id = Column(Integer, primary_key=True, autoincrement=False)

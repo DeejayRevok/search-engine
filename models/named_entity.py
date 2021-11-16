@@ -1,6 +1,3 @@
-"""
-Named entity database model definition module
-"""
 from sqlalchemy import Column, Integer, String, Table, ForeignKey
 from sqlalchemy.orm import relationship, backref
 
@@ -14,9 +11,6 @@ news_association = Table('new_named_entity', BASE.metadata,
 
 
 class NamedEntity(BASE):
-    """
-    Named entity model
-    """
     __tablename__ = 'named_entity'
 
     id = Column(Integer, primary_key=True)
@@ -38,11 +32,5 @@ class NamedEntity(BASE):
         back_populates="named_entities")
 
     def __iter__(self) -> iter:
-        """
-        Iterate over the model properties
-
-        Returns: iterator to the model properties
-
-        """
         yield 'value', self.value
         yield 'named_entity_type', dict(self.named_entity_type)

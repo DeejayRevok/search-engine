@@ -1,6 +1,3 @@
-"""
-Application container configuration module
-"""
 from pypendency.argument import Argument
 from pypendency.definition import Definition
 
@@ -13,9 +10,6 @@ container: ConfigurableContainer = ConfigurableContainer([], config)
 
 
 def load():
-    """
-    Load all the application services in the container
-    """
     container.set_definition(Definition(
         "apm",
         "elasticapm.Client",

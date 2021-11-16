@@ -1,6 +1,3 @@
-"""
-Newspaper database model definition module
-"""
 from sqlalchemy import Column, Integer, String, Table, ForeignKey
 from sqlalchemy.orm import relationship, backref
 
@@ -18,9 +15,6 @@ noun_chunks_association = Table('newspaper_noun_chunk', BASE.metadata,
 
 
 class Newspaper(BASE):
-    """
-    Newspaper model
-    """
     __tablename__ = 'newspaper'
 
     id = Column(Integer, primary_key=True)
@@ -45,10 +39,4 @@ class Newspaper(BASE):
                            back_populates="newspaper_follows")
 
     def __iter__(self) -> iter:
-        """
-        Iterate over the model properties
-
-        Returns: iterator to the model properties
-
-        """
         yield 'name', self.name

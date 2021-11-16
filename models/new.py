@@ -1,6 +1,3 @@
-"""
-New database model definition module
-"""
 from sqlalchemy import Column, Integer, String, Float, ForeignKey
 from sqlalchemy.orm import relationship, backref
 
@@ -12,9 +9,6 @@ from models.user import user_news, new_likes
 
 
 class New(BASE):
-    """
-    New model
-    """
     __tablename__ = 'new'
 
     id = Column(Integer, primary_key=True)
@@ -48,12 +42,6 @@ class New(BASE):
         back_populates="new_likes")
 
     def __iter__(self) -> iter:
-        """
-        Iterate over the model properties
-
-        Returns: iterator to the model properties
-
-        """
         yield 'title', self.title
         yield 'sentiment', self.sentiment
         yield 'url', self.url
