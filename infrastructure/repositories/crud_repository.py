@@ -1,7 +1,7 @@
 from logging import Logger
 
 from sqlalchemy.exc import IntegrityError
-from typing import Iterator, Any, ClassVar, Optional
+from typing import Iterator, ClassVar, Optional
 
 from log_config import get_logger
 from models.base import BASE

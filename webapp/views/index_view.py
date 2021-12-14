@@ -1,3 +1,6 @@
+from logging import Logger
+
+from aiohttp import web
 from aiohttp.web_app import Application
 from aiohttp.web_exceptions import HTTPBadRequest
 from aiohttp.web_request import Request
@@ -5,21 +8,32 @@ from aiohttp.web_response import Response, json_response
 from aiohttp_apispec import docs, request_schema
 from dacite import from_dict
 
-from news_service_lib import ClassRouteTableDef, login_required
-from news_service_lib.models import New, NamedEntity
+from news_service_lib.decorators import login_required
+from news_service_lib.models.new import New
 
-from log_config import get_logger
-from webapp.container_config import container
+from services.index_service import IndexService
 from webapp.definitions import API_VERSION
 from webapp.request_schemas.index_views_schemas import PostIndexSchema
-from models import New as NewModel
+from models.new import New as NewModel
 
 ROOT_PATH = '/api/index'
-LOGGER = get_logger()
-ROUTES = ClassRouteTableDef()
 
 
-class IndexViews:
+class IndexView:
+    __ROOT_PATH = '/api/index'
+
+    def __init__(self, web_container: Application, index_service: IndexService, logger: Logger):
+        self.__index_service = index_service
+        self.__logger = logger
+        self.__setup_routes(web_container)
+
+    def __setup_routes(self, web_container: Application) -> None:
+        web_container.add_routes(
+            [
+                web.post(f"/{API_VERSION}{self.__ROOT_PATH}", self.index_new),
+            ]
+        )
+
     @docs(
         tags=['Indexing'],
         summary="Index",
@@ -27,26 +41,18 @@ class IndexViews:
         security=[{'ApiKeyAuth': []}]
     )
     @request_schema(PostIndexSchema)
-    @ROUTES.post(f'/{API_VERSION}{ROOT_PATH}')
     async def index_new(self, request: Request) -> Response:
         @login_required
         async def request_executor(inner_request):
-            LOGGER.info('REST request to index new')
+            self.__logger.info('REST request to index new')
 
             try:
                 new_data = from_dict(New, inner_request['data'])
             except Exception as ex:
                 raise HTTPBadRequest(text=str(ex)) from ex
 
-            index_service = container.get('index_service')
-            indexed_new: NewModel = index_service.index_new(new_data)
+            indexed_new: NewModel = await self.__index_service.index_new(new_data)
 
             return json_response(dict(indexed_new), status=200)
 
         return await request_executor(request)
-
-
-def setup_routes(app: Application):
-    ROUTES.clean_routes()
-    ROUTES.add_class_routes(IndexViews())
-    app.router.add_routes(ROUTES)

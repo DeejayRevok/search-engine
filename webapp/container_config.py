@@ -2,7 +2,7 @@ from pypendency.argument import Argument
 from pypendency.definition import Definition
 
 from news_service_lib.configurable_container import ConfigurableContainer
-from news_service_lib.storage.sql import SqlEngineType
+from news_service_lib.storage.sql.engine_type import SqlEngineType
 
 from config import config
 
