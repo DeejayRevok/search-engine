@@ -1,6 +1,4 @@
-"""
-Source follow mutations tests module
-"""
+from logging import getLogger
 from unittest import TestCase
 
 from aiohttp.web_app import Application
@@ -9,11 +7,15 @@ from graphene.test import Client
 from graphql.execution.executors.asyncio import AsyncioExecutor
 import nest_asyncio
 
-from news_service_lib.storage.sql import create_sql_engine, SqlEngineType, SqlSessionProvider, init_sql_db
+from infrastructure.repositories.source_repository import SourceRepository
+from infrastructure.repositories.user_repository import UserRepository
+from models.base import BASE
 
-from models import BASE
-from services.crud.source_service import SourceService
-from services.crud.user_service import UserService
+from models.source import Source
+from models.user import User
+from news_service_lib.storage.sql.engine_type import SqlEngineType
+from news_service_lib.storage.sql.session_provider import SqlSessionProvider
+from news_service_lib.storage.sql.utils import create_sql_engine
 from webapp.container_config import container
 from webapp.graph import schema
 
@@ -21,18 +23,12 @@ nest_asyncio.apply()
 
 
 class MockRequest:
-    """
-    Mocked request used for testing purposes
-    """
     def __init__(self, user, app):
         self.user = user
         self.app = app
 
 
 class TestNewLikeMutations(TestCase):
-    """
-    Source follow mutations test cases implementation
-    """
     USER_ID = 1
     TEST_SOURCE = 'test_source'
     FOLLOW_SOURCE_MUTATION = '''
@@ -52,31 +48,27 @@ class TestNewLikeMutations(TestCase):
                 '''
 
     def setUp(self) -> None:
-        """
-        Set up the test environment creating the database engine
-        """
         container.reset()
         test_engine = create_sql_engine(SqlEngineType.SQLITE)
         self.session_provider = SqlSessionProvider(test_engine)
         BASE.query = self.session_provider.query_property
-        init_sql_db(BASE, test_engine)
+        BASE.metadata.bind = test_engine
+        BASE.metadata.create_all()
+        logger = getLogger()
 
-        self.user_service = UserService(session_provider=self.session_provider)
-        self.source_service = SourceService(session_provider=self.session_provider)
+        self.user_repository = UserRepository(self.session_provider, logger)
+        self.source_repository = SourceRepository(self.session_provider, logger)
 
         app = Application()
         container.set('session_provider', self.session_provider)
-        container.set('source_service', self.source_service)
-        container.set('user_service', self.user_service)
+        container.set('source_repository', self.source_repository)
+        container.set('user_repository', self.user_repository)
         self.app = app
 
     @async_test
     async def test_follow_source_success(self):
-        """
-        Test the follow source mutation stores the source
-        """
-        await self.source_service.save(name=self.TEST_SOURCE)
-        await self.user_service.save(id=self.USER_ID, username='test')
+        await self.source_repository.save(Source(name=self.TEST_SOURCE))
+        await self.user_repository.save(User(id=self.USER_ID, username='test'))
         client = Client(schema)
         client.execute(self.FOLLOW_SOURCE_MUTATION,
                        variable_values={
@@ -85,15 +77,12 @@ class TestNewLikeMutations(TestCase):
                        context_value={'request': MockRequest({'id': self.USER_ID}, self.app)},
                        executor=AsyncioExecutor())
         with self.session_provider():
-            source = await self.source_service.read_one(name=self.TEST_SOURCE)
+            source = await self.source_repository.get_one_filtered(name=self.TEST_SOURCE)
             self.assertTrue(len(source.follows))
 
     @async_test
     async def test_follow_unexisting_source(self):
-        """
-        Test following an unexisting source returns error
-        """
-        await self.user_service.save(id=self.USER_ID, username='test')
+        await self.user_repository.save(User(id=self.USER_ID, username='test'))
         client = Client(schema)
         response = client.execute(self.FOLLOW_SOURCE_MUTATION,
                                   variable_values={
@@ -106,11 +95,8 @@ class TestNewLikeMutations(TestCase):
 
     @async_test
     async def test_unfollow_source(self):
-        """
-        Test unfollowing a source unfollows it
-        """
-        await self.source_service.save(name=self.TEST_SOURCE)
-        await self.user_service.save(id=self.USER_ID, username='test')
+        await self.source_repository.save(Source(name=self.TEST_SOURCE))
+        await self.user_repository.save(User(id=self.USER_ID, username='test'))
         client = Client(schema)
         executor = AsyncioExecutor()
         client.execute(self.FOLLOW_SOURCE_MUTATION,
@@ -120,7 +106,7 @@ class TestNewLikeMutations(TestCase):
                        context_value={'request': MockRequest({'id': self.USER_ID}, self.app)},
                        executor=executor)
         with self.session_provider():
-            source = await self.source_service.read_one(name=self.TEST_SOURCE)
+            source = await self.source_repository.get_one_filtered(name=self.TEST_SOURCE)
             self.assertTrue(len(source.follows))
         client.execute(self.UNFOLLOW_SOURCE_MUTATION,
                        variable_values={
@@ -129,15 +115,12 @@ class TestNewLikeMutations(TestCase):
                        context_value={'request': MockRequest({'id': self.USER_ID}, self.app)},
                        executor=executor)
         with self.session_provider():
-            source = await self.source_service.read_one(name=self.TEST_SOURCE)
+            source = await self.source_repository.get_one_filtered(name=self.TEST_SOURCE)
             self.assertFalse(len(source.follows))
 
     @async_test
     async def test_unfollow_source_not_followed(self):
-        """
-        Test unfollowing a source not followed returns error
-        """
-        await self.user_service.save(id=self.USER_ID, username='test')
+        await self.user_repository.save(User(id=self.USER_ID, username='test'))
         client = Client(schema)
         executor = AsyncioExecutor()
         response = client.execute(self.UNFOLLOW_SOURCE_MUTATION,

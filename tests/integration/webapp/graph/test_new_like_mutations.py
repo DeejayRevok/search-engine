@@ -1,6 +1,4 @@
-"""
-New like mutations tests module
-"""
+from logging import getLogger
 from unittest import TestCase
 
 from aiohttp.web_app import Application
@@ -9,12 +7,16 @@ from graphene.test import Client
 from graphql.execution.executors.asyncio import AsyncioExecutor
 import nest_asyncio
 
-from news_service_lib.storage.sql import create_sql_engine, SqlEngineType, SqlSessionProvider, init_sql_db
-
-from models import BASE
-from services.crud.new_service import NewService
-from services.crud.source_service import SourceService
-from services.crud.user_service import UserService
+from infrastructure.repositories.new_repository import NewRepository
+from infrastructure.repositories.source_repository import SourceRepository
+from infrastructure.repositories.user_repository import UserRepository
+from models.base import BASE
+from models.new import New
+from models.source import Source
+from models.user import User
+from news_service_lib.storage.sql.engine_type import SqlEngineType
+from news_service_lib.storage.sql.session_provider import SqlSessionProvider
+from news_service_lib.storage.sql.utils import create_sql_engine
 from webapp.container_config import container
 from webapp.graph import schema
 
@@ -22,18 +24,12 @@ nest_asyncio.apply()
 
 
 class MockRequest:
-    """
-    Mocked request used for testing purposes
-    """
     def __init__(self, user, app):
         self.user = user
         self.app = app
 
 
 class TestNewLikeMutations(TestCase):
-    """
-    New like mutations test cases implementation
-    """
     USER_ID = 1
     TEST_NEW = 'test_new'
     LIKE_NEW_MUTATION = '''
@@ -53,34 +49,29 @@ class TestNewLikeMutations(TestCase):
                 '''
 
     def setUp(self) -> None:
-        """
-        Set up the test environment creating the database engine
-        """
         container.reset()
         test_engine = create_sql_engine(SqlEngineType.SQLITE)
         self.session_provider = SqlSessionProvider(test_engine)
         BASE.query = self.session_provider.query_property
-        init_sql_db(BASE, test_engine)
+        BASE.metadata.bind = test_engine
+        BASE.metadata.create_all()
+        logger = getLogger()
 
-        self.new_service = NewService(session_provider=self.session_provider)
-        self.user_service = UserService(session_provider=self.session_provider)
-        self.source_service = SourceService(session_provider=self.session_provider)
+        self.new_repository = NewRepository(self.session_provider, logger)
+        self.user_repository = UserRepository(self.session_provider, logger)
+        self.source_repository = SourceRepository(self.session_provider, logger)
 
         app = Application()
         container.set('session_provider', self.session_provider)
-        container.set('new_service', self.new_service)
-        container.set('user_service', self.user_service)
+        container.set('new_repository', self.new_repository)
+        container.set('user_repository', self.user_repository)
         self.app = app
 
     @async_test
     async def test_like_new_success(self):
-        """
-        Test the like new mutation stores the like
-        """
-        await self.source_service.save(name='test_source')
-        await self.user_service.save(id=self.USER_ID, username='test')
-        await self.new_service.save(title=self.TEST_NEW, url='test_url', sentiment=0.0,
-                                    source_id=1)
+        await self.source_repository.save(Source(name='test_source'))
+        await self.user_repository.save(User(id=self.USER_ID, username='test'))
+        await self.new_repository.save(New(title=self.TEST_NEW, url='test_url', sentiment=0.0, source_id=1))
         client = Client(schema)
         client.execute(self.LIKE_NEW_MUTATION,
                        variable_values={
@@ -89,15 +80,12 @@ class TestNewLikeMutations(TestCase):
                        context_value={'request': MockRequest({'id': self.USER_ID}, self.app)},
                        executor=AsyncioExecutor())
         with self.session_provider():
-            new = await self.new_service.read_one(title=self.TEST_NEW)
+            new = await self.new_repository.get_one_filtered(title=self.TEST_NEW)
             self.assertTrue(len(new.likes))
 
     @async_test
     async def test_like_unexisting_new(self):
-        """
-        Test liking an unexisting new returns error
-        """
-        await self.user_service.save(id=self.USER_ID, username='test')
+        await self.user_repository.save(User(id=self.USER_ID, username='test'))
         client = Client(schema)
         response = client.execute(self.LIKE_NEW_MUTATION,
                                   variable_values={
@@ -110,13 +98,9 @@ class TestNewLikeMutations(TestCase):
 
     @async_test
     async def test_delete_new_like(self):
-        """
-        Test deleting a new like deletes it
-        """
-        await self.source_service.save(name='test_source')
-        await self.user_service.save(id=self.USER_ID, username='test')
-        await self.new_service.save(title=self.TEST_NEW, url='test_url', sentiment=0.0,
-                                    source_id=1)
+        await self.source_repository.save(Source(name='test_source'))
+        await self.user_repository.save(User(id=self.USER_ID, username='test'))
+        await self.new_repository.save(New(title=self.TEST_NEW, url='test_url', sentiment=0.0, source_id=1))
         client = Client(schema)
         executor = AsyncioExecutor()
         client.execute(self.LIKE_NEW_MUTATION,
@@ -126,7 +110,7 @@ class TestNewLikeMutations(TestCase):
                        context_value={'request': MockRequest({'id': self.USER_ID}, self.app)},
                        executor=executor)
         with self.session_provider():
-            new = await self.new_service.read_one(title=self.TEST_NEW)
+            new = await self.new_repository.get_one_filtered(title=self.TEST_NEW)
             self.assertTrue(len(new.likes))
         client.execute(self.DELETE_LIKE_MUTATION,
                        variable_values={
@@ -135,15 +119,12 @@ class TestNewLikeMutations(TestCase):
                        context_value={'request': MockRequest({'id': self.USER_ID}, self.app)},
                        executor=executor)
         with self.session_provider():
-            new = await self.new_service.read_one(title=self.TEST_NEW)
+            new = await self.new_repository.get_one_filtered(title=self.TEST_NEW)
             self.assertFalse(len(new.likes))
 
     @async_test
     async def test_deleting_like_not_created(self):
-        """
-        Test deleting a like from a new not liked yet returns error
-        """
-        await self.user_service.save(id=self.USER_ID, username='test')
+        await self.user_repository.save(User(id=self.USER_ID, username='test'))
         client = Client(schema)
         executor = AsyncioExecutor()
         response = client.execute(self.DELETE_LIKE_MUTATION,

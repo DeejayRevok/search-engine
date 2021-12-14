@@ -1,6 +1,3 @@
-"""
-Index service tests module
-"""
 import json
 import platform
 from dataclasses import asdict
@@ -14,17 +11,22 @@ from dynaconf.loaders import settings_loader
 from elasticapm import Client
 
 from config import config
-from news_service_lib.models import New, NamedEntity
-from news_service_lib.storage.sql import create_sql_engine, SqlEngineType, init_sql_db, SqlSessionProvider
+from infrastructure.repositories.named_entity_repository import NamedEntityRepository
+from infrastructure.repositories.named_entity_type_repository import NamedEntityTypeRepository
+from infrastructure.repositories.new_repository import NewRepository
+from infrastructure.repositories.source_repository import SourceRepository
+from models.base import BASE
+from news_service_lib.models.language import Language
+from news_service_lib.models.named_entity import NamedEntity
+from news_service_lib.models.new import New
+from news_service_lib.storage.sql.engine_type import SqlEngineType
+from news_service_lib.storage.sql.session_provider import SqlSessionProvider
+from news_service_lib.storage.sql.utils import create_sql_engine
 
-from models import BASE, New as NewModel
-from services.crud.named_entity_service import NamedEntityService
-from services.crud.named_entity_type_service import NamedEntityTypeService
-from services.crud.new_service import NewService
-from services.crud.source_service import SourceService
 from services.index_service import IndexService
 from tests import TEST_CONFIG_PATH
 from webapp.container_config import container
+from models.new import New as NewModel
 
 LOGGER = getLogger()
 
@@ -36,6 +38,7 @@ TEST_NEW = New(title="Test title",
                source="Test source",
                sentiment=3.4,
                date=23452435.0,
+               language=Language.ENGLISH.value,
                entities=[NamedEntity(text="Test entity 1", type=TEST_ENTITY_TYPE_1),
                          NamedEntity(text="Test entity 2", type=TEST_ENTITY_TYPE_1)])
 
@@ -45,25 +48,19 @@ TEST_NEW_2 = New(title="Test title 2",
                  source="Test source",
                  sentiment=4.6,
                  date=2323452345.0,
+                 language=Language.ENGLISH.value,
                  entities=[NamedEntity(text="Test entity 3", type=TEST_ENTITY_TYPE_1),
                            NamedEntity(text="Test entity 4", type=TEST_ENTITY_TYPE_2)])
 
 
 class TestIndexService(TestCase):
-    """
-    Index service test cases implementation
-    """
     @classmethod
     def setUpClass(cls) -> None:
-        """
-        Set up test case environment
-        """
         settings_loader(config, filename=TEST_CONFIG_PATH)
 
-    @patch('services.index_service.create_sql_engine')
     @patch('services.index_service.Process')
     @patch('services.index_service.ExchangeConsumer')
-    def setUp(self, consumer_mock, process_mock, create_engine_mock) -> None:
+    def setUp(self, consumer_mock, process_mock) -> None:
         container.reset()
 
         self.apm_mock = Mock(spec=Client)
@@ -73,22 +70,20 @@ class TestIndexService(TestCase):
         self.app = Application()
 
         test_engine = create_sql_engine(SqlEngineType.SQLITE)
-        init_sql_db(BASE, test_engine)
+
+        BASE.metadata.bind = test_engine
+        BASE.metadata.create_all()
+
         self.session_provider = SqlSessionProvider(test_engine)
 
-        create_engine_mock.return_value = test_engine
-
-        self.source_service = SourceService(self.session_provider)
-        self.news_service = NewService(self.session_provider)
-        self.named_entity_service = NamedEntityService(self.session_provider)
-        self.named_entity_type_service = NamedEntityTypeService(self.session_provider)
-        self.index_service = IndexService()
+        logger = getLogger()
+        self.source_repo = SourceRepository(self.session_provider, logger)
+        self.news_repo = NewRepository(self.session_provider, logger)
+        self.named_entity_repo = NamedEntityRepository(self.session_provider, logger)
+        self.named_entity_type_repo = NamedEntityTypeRepository(self.session_provider, logger)
+        self.index_service = IndexService(logger, test_engine)
 
     def test_initialize_service(self):
-        """
-        Test initializing the index service initializes the associated exchange consumer in separated process
-        and starts the process
-        """
         self.consumer_mock.assert_called_once()
         if platform.system() != 'Windows':
             self.process_mock.assert_called_with(target=self.consumer_mock().__call__)
@@ -96,40 +91,32 @@ class TestIndexService(TestCase):
 
     @async_test
     async def test_index_new(self):
-        """
-        Test the indexing a new creates the new entity the source entity and its associated named entities
-        and named entity types
-        """
         await self.index_service.index_new(TEST_NEW)
 
         with self.session_provider(read_only=True):
-            indexed_new = await self.news_service.read_one(title=TEST_NEW.title)
+            indexed_new = await self.news_repo.get_one_filtered(title=TEST_NEW.title)
             self.assertIsInstance(indexed_new, NewModel)
             self.assertEqual(indexed_new.title, TEST_NEW.title)
             self.assertEqual(indexed_new.sentiment, TEST_NEW.sentiment)
             self.assertEqual(indexed_new.source.name, TEST_NEW.source)
             self.assertEqual(len(indexed_new.named_entities), 2)
 
-            named_entity_types = await self.named_entity_type_service.read_all()
+            named_entity_types = await self.named_entity_type_repo.get_filtered()
             self.assertEqual(len(list(named_entity_types)), 1)
 
     @async_test
     async def test_index_multiple_news(self):
-        """
-        Test the indexing multiple news creates the new entities the source entities and its associated named entities
-        and named entity types
-        """
         await self.index_service.index_new(TEST_NEW)
         await self.index_service.index_new(TEST_NEW_2)
 
         with self.session_provider(read_only=True):
-            indexed_news = await self.news_service.read_all()
+            indexed_news = await self.news_repo.get_filtered()
             self.assertEqual(len(list(indexed_news)), 2)
 
-            sources = await self.source_service.read_all()
+            sources = await self.source_repo.get_filtered()
             self.assertEqual(len(list(sources)), 1)
 
-            named_entity_types = list(await self.named_entity_type_service.read_all())
+            named_entity_types = list(await self.named_entity_type_repo.get_filtered())
             self.assertEqual(len(named_entity_types), 2)
 
             named_entity_type_1 = next(filter(lambda net: net.name == TEST_ENTITY_TYPE_1, named_entity_types))
@@ -145,9 +132,6 @@ class TestIndexService(TestCase):
             self.assertEqual(len(named_entities_type_2), 1)
 
     def test_index_message(self):
-        """
-        Test indexing multiple messages calls the index message and manages the transaction
-        """
         index_new_mock_calls = 0
 
         async def index_new_mock_async(*_):
@@ -167,9 +151,6 @@ class TestIndexService(TestCase):
         self.assertEqual(self.apm_mock.end_transaction.call_count, 2)
 
     def test_index_message_fail(self):
-        """
-        Test if index new fails the apm client ends the transaction and captures the exception
-        """
         async def index_new_mock_async(*_):
             raise Exception('Test exception')
 
@@ -183,9 +164,6 @@ class TestIndexService(TestCase):
 
     @async_test
     async def test_shutdown(self):
-        """
-        Test shutting down the service shuts down the consumer and wait the consumer process to join
-        """
         await self.index_service.shutdown()
         self.consumer_mock().shutdown.assert_called_once()
         if platform.system() != 'Windows':

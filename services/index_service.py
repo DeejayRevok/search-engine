@@ -58,7 +58,7 @@ class IndexService:
 
     async def __index_source(self, source_name: str) -> Source:
         saved_source: Source = await self.__source_repository.get_one_filtered(name=source_name)
-        if saved_source is not None:
+        if saved_source is None:
             saved_source = await self.__source_repository.save(Source(name=source_name))
         return saved_source
 

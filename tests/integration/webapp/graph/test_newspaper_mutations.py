@@ -1,6 +1,4 @@
-"""
-Newspaper mutations tests module
-"""
+from logging import getLogger
 from unittest import TestCase
 
 import asyncio
@@ -10,13 +8,18 @@ from graphene.test import Client
 from graphql.execution.executors.asyncio import AsyncioExecutor
 import nest_asyncio
 
-from news_service_lib.storage.sql import create_sql_engine, SqlEngineType, SqlSessionProvider, init_sql_db
+from infrastructure.repositories.named_entity_repository import NamedEntityRepository
+from infrastructure.repositories.named_entity_type_repository import NamedEntityTypeRepository
+from infrastructure.repositories.newspaper_repository import NewspaperRepository
+from infrastructure.repositories.noun_chunk_repository import NounChunkRepository
+from models.base import BASE
 
-from models import BASE
-from services.crud.named_entity_service import NamedEntityService
-from services.crud.named_entity_type_service import NamedEntityTypeService
-from services.crud.newspaper_service import NewspaperService
-from services.crud.noun_chunk_service import NounChunkService
+from models.named_entity import NamedEntity
+from models.named_entity_type import NamedEntityType
+from models.noun_chunk import NounChunk
+from news_service_lib.storage.sql.engine_type import SqlEngineType
+from news_service_lib.storage.sql.session_provider import SqlSessionProvider
+from news_service_lib.storage.sql.utils import create_sql_engine
 from webapp.container_config import container
 from webapp.graph import schema
 
@@ -24,18 +27,12 @@ nest_asyncio.apply()
 
 
 class MockRequest:
-    """
-    Mocked request used for testing purposes
-    """
     def __init__(self, user, app):
         self.user = user
         self.app = app
 
 
 class TestNewspaperMutations(TestCase):
-    """
-    Newspaper mutations test cases implementation
-    """
     CREATE_NEWSPAPER_MUTATION = '''
                 mutation {
                     createNewspaper(name: "test", namedEntities: ["test_entity_1"], nounChunks: ["test_noun_chunk_1"]){
@@ -69,55 +66,48 @@ class TestNewspaperMutations(TestCase):
     TEST_NOUN_CHUNK_3 = 'test_noun_chunk_3'
 
     def setUp(self) -> None:
-        """
-        Set up the test environment creating the database engine
-        """
         container.reset()
         test_engine = create_sql_engine(SqlEngineType.SQLITE)
         self.session_provider = SqlSessionProvider(test_engine)
         BASE.query = self.session_provider.query_property
-        init_sql_db(BASE, test_engine)
+        BASE.metadata.bind = test_engine
+        BASE.metadata.create_all()
+        logger = getLogger()
 
-        named_entity_type_service = NamedEntityTypeService(session_provider=self.session_provider)
-        named_entity_service = NamedEntityService(session_provider=self.session_provider)
-        named_entity_type = asyncio.run(named_entity_type_service.save(name='TEST'))
-        asyncio.run(named_entity_service.save(value=self.TEST_ENTITY_1, named_entity_type_id=named_entity_type.id))
-        asyncio.run(named_entity_service.save(value=self.TEST_ENTITY_2, named_entity_type_id=named_entity_type.id))
+        named_entity_type_repository = NamedEntityTypeRepository(self.session_provider, logger)
+        named_entity_repository = NamedEntityRepository(self.session_provider, logger)
+        named_entity_type = asyncio.run(named_entity_type_repository.save(NamedEntityType(name='TEST')))
+        asyncio.run(named_entity_repository.save(NamedEntity(value=self.TEST_ENTITY_1, named_entity_type_id=named_entity_type.id)))
+        asyncio.run(named_entity_repository.save(NamedEntity(value=self.TEST_ENTITY_2, named_entity_type_id=named_entity_type.id)))
 
-        noun_chunks_service = NounChunkService(session_provider=self.session_provider)
-        asyncio.run(noun_chunks_service.save(value=self.TEST_NOUN_CHUNK_1))
-        asyncio.run(noun_chunks_service.save(value=self.TEST_NOUN_CHUNK_2))
-        asyncio.run(noun_chunks_service.save(value=self.TEST_NOUN_CHUNK_3))
+        noun_chunks_repository = NounChunkRepository(self.session_provider, logger)
+        asyncio.run(noun_chunks_repository.save(NounChunk(value=self.TEST_NOUN_CHUNK_1)))
+        asyncio.run(noun_chunks_repository.save(NounChunk(value=self.TEST_NOUN_CHUNK_2)))
+        asyncio.run(noun_chunks_repository.save(NounChunk(value=self.TEST_NOUN_CHUNK_3)))
 
-        self.newspaper_service = NewspaperService(session_provider=self.session_provider)
+        self.newspaper_repository = NewspaperRepository(self.session_provider, logger)
 
         app = Application()
         container.set('session_provider', self.session_provider)
-        container.set('named_entity_service', named_entity_service)
-        container.set('noun_chunk_service', noun_chunks_service)
-        container.set('newspaper_service', self.newspaper_service)
+        container.set('named_entity_repository', named_entity_repository)
+        container.set('noun_chunk_repository', noun_chunks_repository)
+        container.set('newspaper_repository', self.newspaper_repository)
         self.app = app
 
     @async_test
     async def test_create_newspaper(self):
-        """
-        Test the create newspaper mutation creates the newspaper with the input parameters
-        """
         client = Client(schema)
         client.execute(self.CREATE_NEWSPAPER_MUTATION,
                        context_value={'request': MockRequest({'id': 1}, self.app)},
                        executor=AsyncioExecutor())
         with self.session_provider():
-            created_newspaper = await self.newspaper_service.read_one(name='test')
+            created_newspaper = await self.newspaper_repository.get_one_filtered(name='test')
             self.assertIsNotNone(created_newspaper)
             self.assertEqual(len(created_newspaper.named_entities), 1)
             self.assertEqual(len(created_newspaper.noun_chunks), 1)
 
     @async_test
     async def test_update_newspaper(self):
-        """
-        Test the update newspaper mutation updates the previously created newspaper
-        """
         client = Client(schema)
         executor = AsyncioExecutor()
         client.execute(self.CREATE_NEWSPAPER_MUTATION,
@@ -127,18 +117,15 @@ class TestNewspaperMutations(TestCase):
                        context_value={'request': MockRequest({'id': 1}, self.app)},
                        executor=executor)
         with self.session_provider():
-            created_newspaper = await self.newspaper_service.read_one(name='test')
+            created_newspaper = await self.newspaper_repository.get_one_filtered(name='test')
             self.assertIsNone(created_newspaper)
 
-            updated_newspaper = await self.newspaper_service.read_one(name='updateName')
+            updated_newspaper = await self.newspaper_repository.get_one_filtered(name='updateName')
             self.assertEqual(len(updated_newspaper.named_entities), 2)
             self.assertEqual(len(updated_newspaper.noun_chunks), 2)
 
     @async_test
     async def test_delete_newspaper(self):
-        """
-        Test the delete newspaper mutations deletes the previously created newspaper
-        """
         client = Client(schema)
         executor = AsyncioExecutor()
         client.execute(self.CREATE_NEWSPAPER_MUTATION,
@@ -148,5 +135,5 @@ class TestNewspaperMutations(TestCase):
                        context_value={'request': MockRequest({'id': 1}, self.app)},
                        executor=executor)
         with self.session_provider():
-            deleted_newspaper = await self.newspaper_service.read_one(name='test')
+            deleted_newspaper = await self.newspaper_repository.get_one_filtered(name='test')
             self.assertIsNone(deleted_newspaper)

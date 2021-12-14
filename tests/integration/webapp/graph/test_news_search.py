@@ -1,30 +1,22 @@
-"""
-News search tests module
-"""
 from unittest import TestCase
 
-from models import BASE, New
-from news_service_lib.storage.sql import create_sql_engine, SqlEngineType, init_sql_db, SqlSessionProvider
+from models.base import BASE
+from models.new import New
+from news_service_lib.storage.sql.engine_type import SqlEngineType
+from news_service_lib.storage.sql.session_provider import SqlSessionProvider
+from news_service_lib.storage.sql.utils import create_sql_engine
 from webapp.graph.model.news_search import TrackInfo, SearchOperation, SearchField, SearchTracker
 
 
 class TestNewsSearch(TestCase):
-    """
-    News search test cases implementation
-    """
     def setUp(self) -> None:
-        """
-        Set up the test environment creating the database engine
-        """
         test_engine = create_sql_engine(SqlEngineType.SQLITE)
         self.session_provider = SqlSessionProvider(test_engine)
         BASE.query = self.session_provider.query_property
-        init_sql_db(BASE, test_engine)
+        BASE.metadata.bind = test_engine
+        BASE.metadata.create_all()
 
     def test_searchable_tracking_query(self):
-        """
-        Check getting the tracking query gets the query which contains all the track operations in the query
-        """
         first_track_info = TrackInfo(operation=SearchOperation.UNION, field=SearchField.NAMED_ENTITY,
                                      value='test_first', previous_track=None)
         second_track_info = TrackInfo(operation=SearchOperation.INTERSECTION, field=SearchField.NOUN_CHUNK,

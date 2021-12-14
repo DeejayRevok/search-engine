@@ -13,7 +13,7 @@ from news_service_lib.models.new import New
 
 from services.index_service import IndexService
 from webapp.definitions import API_VERSION
-from webapp.request_schemas.index_views_schemas import PostIndexSchema
+from webapp.request_schemas.index_view_schemas import PostIndexSchema
 from models.new import New as NewModel
 
 ROOT_PATH = '/api/index'
