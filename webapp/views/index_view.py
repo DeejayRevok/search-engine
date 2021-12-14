@@ -16,11 +16,11 @@ from webapp.definitions import API_VERSION
 from webapp.request_schemas.index_view_schemas import PostIndexSchema
 from models.new import New as NewModel
 
-ROOT_PATH = '/api/index'
+ROOT_PATH = "/api/index"
 
 
 class IndexView:
-    __ROOT_PATH = '/api/index'
+    __ROOT_PATH = "/api/index"
 
     def __init__(self, web_container: Application, index_service: IndexService, logger: Logger):
         self.__index_service = index_service
@@ -34,20 +34,15 @@ class IndexView:
             ]
         )
 
-    @docs(
-        tags=['Indexing'],
-        summary="Index",
-        description="Index new data",
-        security=[{'ApiKeyAuth': []}]
-    )
+    @docs(tags=["Indexing"], summary="Index", description="Index new data", security=[{"ApiKeyAuth": []}])
     @request_schema(PostIndexSchema)
     async def index_new(self, request: Request) -> Response:
         @login_required
         async def request_executor(inner_request):
-            self.__logger.info('REST request to index new')
+            self.__logger.info("REST request to index new")
 
             try:
-                new_data = from_dict(New, inner_request['data'])
+                new_data = from_dict(New, inner_request["data"])
             except Exception as ex:
                 raise HTTPBadRequest(text=str(ex)) from ex
 

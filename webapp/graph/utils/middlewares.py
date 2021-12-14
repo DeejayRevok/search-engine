@@ -14,7 +14,7 @@ class SQLMiddleware:
         self._session_provider = session_provider
 
     def on_error(self, error: Exception):
-        LOGGER.error('Catching error, clearing SQL session')
+        LOGGER.error("Catching error, clearing SQL session")
         self._session_provider.clear_session()
         raise error
 

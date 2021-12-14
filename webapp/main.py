@@ -30,14 +30,14 @@ from webapp.views.index_view import IndexView
 
 
 async def shutdown(_):
-    await container.get('index_service').shutdown()
+    await container.get("index_service").shutdown()
 
 
 def init_sql_db(storage_engine: Engine) -> None:
     BASE.metadata.bind = storage_engine
     if ALEMBIC_INI_PATH:
         alembic_cfg = Config(ALEMBIC_INI_PATH)
-        alembic_cfg.set_section_option('alembic', 'sqlalchemy.url', str(storage_engine.url))
+        alembic_cfg.set_section_option("alembic", "sqlalchemy.url", str(storage_engine.url))
         if len(inspect(storage_engine).get_table_names()):
             command.upgrade(alembic_cfg, "head")
         else:
@@ -57,11 +57,11 @@ def init_search_engine() -> Application:
     app["host"] = loaded_config.server.host
     app["port"] = loaded_config.server.port
 
-    ElasticAPM(app, container.get('apm'))
+    ElasticAPM(app, container.get("apm"))
 
     logger = get_logger()
-    storage_engine = container.get('storage_engine')
-    session_provider = container.get('session_provider')
+    storage_engine = container.get("storage_engine")
+    session_provider = container.get("session_provider")
     sql_health_checker = SQLHealthChecker(session_provider, logger)
     if not sql_health_checker.health_check():
         sys.exit(1)
@@ -71,7 +71,7 @@ def init_search_engine() -> Application:
 
     setup_healthcheck(app, sql_health_checker)
 
-    container.get('index_service')
+    container.get("index_service")
     redis_config = config.redis
     redis_healthchecker = RedisHealthChecker(**redis_config)
     run_event_bus(config.redis, redis_healthchecker, logger, UserRepository(session_provider, logger))
@@ -88,6 +88,6 @@ def init_search_engine() -> Application:
     return app
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app = init_search_engine()
     run_app(app, host=app["host"], port=app["port"], access_log=get_logger())

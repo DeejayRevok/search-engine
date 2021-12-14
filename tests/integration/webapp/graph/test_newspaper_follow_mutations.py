@@ -29,22 +29,22 @@ class MockRequest:
 
 class TestNewspaperFollowMutations(TestCase):
     USER_ID = 1
-    TEST_NEWSPAPER = 'test_newspaper'
-    FOLLOW_NEWSPAPER_MUTATION = '''
+    TEST_NEWSPAPER = "test_newspaper"
+    FOLLOW_NEWSPAPER_MUTATION = """
                 mutation FollowNewspaper($name: String!){
                     followNewspaper(newspaperName: $name){
                         ok
                     }
                 }
-            '''
+            """
 
-    UNFOLLOW_NEWSPAPER_MUTATION = '''
+    UNFOLLOW_NEWSPAPER_MUTATION = """
                     mutation UnfollowNewspaper($name: String!){
                         unfollowNewspaper(newspaperName: $name){
                             ok
                         }
                     }
-                '''
+                """
 
     def setUp(self) -> None:
         container.reset()
@@ -59,93 +59,93 @@ class TestNewspaperFollowMutations(TestCase):
         self.user_repository = UserRepository(self.session_provider, logger)
 
         app = Application()
-        container.set('session_provider', self.session_provider)
-        container.set('newspaper_repository', self.newspaper_repository)
-        container.set('user_repository', self.user_repository)
+        container.set("session_provider", self.session_provider)
+        container.set("newspaper_repository", self.newspaper_repository)
+        container.set("user_repository", self.user_repository)
         self.app = app
 
     @async_test
     async def test_follow_newspaper_success(self):
-        await self.user_repository.save(User(id=2, username='test2'))
-        await self.user_repository.save(User(id=self.USER_ID, username='test'))
+        await self.user_repository.save(User(id=2, username="test2"))
+        await self.user_repository.save(User(id=self.USER_ID, username="test"))
         await self.newspaper_repository.save(Newspaper(name=self.TEST_NEWSPAPER, user_id=2))
         client = Client(schema)
-        client.execute(self.FOLLOW_NEWSPAPER_MUTATION,
-                       variable_values={
-                         'name': self.TEST_NEWSPAPER
-                       },
-                       context_value={'request': MockRequest({'id': self.USER_ID}, self.app)},
-                       executor=AsyncioExecutor())
+        client.execute(
+            self.FOLLOW_NEWSPAPER_MUTATION,
+            variable_values={"name": self.TEST_NEWSPAPER},
+            context_value={"request": MockRequest({"id": self.USER_ID}, self.app)},
+            executor=AsyncioExecutor(),
+        )
         with self.session_provider():
             newspaper = await self.newspaper_repository.get_one_filtered(name=self.TEST_NEWSPAPER)
             self.assertTrue(len(newspaper.follows))
 
     @async_test
     async def test_follow_newspaper_same_user(self):
-        await self.user_repository.save(User(id=2, username='test2'))
-        await self.user_repository.save(User(id=self.USER_ID, username='test'))
+        await self.user_repository.save(User(id=2, username="test2"))
+        await self.user_repository.save(User(id=self.USER_ID, username="test"))
         await self.newspaper_repository.save(Newspaper(name=self.TEST_NEWSPAPER, user_id=self.USER_ID))
         client = Client(schema)
-        response = client.execute(self.FOLLOW_NEWSPAPER_MUTATION,
-                                  variable_values={
-                                     'name': self.TEST_NEWSPAPER
-                                  },
-                                  context_value={'request': MockRequest({'id': self.USER_ID}, self.app)},
-                                  executor=AsyncioExecutor())
-        self.assertIn('errors', response)
-        self.assertGreater(len(response['errors']), 0)
+        response = client.execute(
+            self.FOLLOW_NEWSPAPER_MUTATION,
+            variable_values={"name": self.TEST_NEWSPAPER},
+            context_value={"request": MockRequest({"id": self.USER_ID}, self.app)},
+            executor=AsyncioExecutor(),
+        )
+        self.assertIn("errors", response)
+        self.assertGreater(len(response["errors"]), 0)
 
     @async_test
     async def test_follow_unexisting_newspaper(self):
-        await self.user_repository.save(User(id=self.USER_ID, username='test'))
+        await self.user_repository.save(User(id=self.USER_ID, username="test"))
         client = Client(schema)
-        response = client.execute(self.FOLLOW_NEWSPAPER_MUTATION,
-                                  variable_values={
-                                     'name': 'unexisting_newspaper'
-                                  },
-                                  context_value={'request': MockRequest({'id': self.USER_ID}, self.app)},
-                                  executor=AsyncioExecutor())
-        self.assertIn('errors', response)
-        self.assertGreater(len(response['errors']), 0)
+        response = client.execute(
+            self.FOLLOW_NEWSPAPER_MUTATION,
+            variable_values={"name": "unexisting_newspaper"},
+            context_value={"request": MockRequest({"id": self.USER_ID}, self.app)},
+            executor=AsyncioExecutor(),
+        )
+        self.assertIn("errors", response)
+        self.assertGreater(len(response["errors"]), 0)
 
     @async_test
     async def test_unfollow_newspaper(self):
-        await self.user_repository.save(User(id=2, username='test2'))
-        await self.user_repository.save(User(id=self.USER_ID, username='test'))
+        await self.user_repository.save(User(id=2, username="test2"))
+        await self.user_repository.save(User(id=self.USER_ID, username="test"))
         await self.newspaper_repository.save(Newspaper(name=self.TEST_NEWSPAPER, user_id=2))
         client = Client(schema)
         executor = AsyncioExecutor()
-        client.execute(self.FOLLOW_NEWSPAPER_MUTATION,
-                       variable_values={
-                           'name': self.TEST_NEWSPAPER
-                       },
-                       context_value={'request': MockRequest({'id': self.USER_ID}, self.app)},
-                       executor=executor)
+        client.execute(
+            self.FOLLOW_NEWSPAPER_MUTATION,
+            variable_values={"name": self.TEST_NEWSPAPER},
+            context_value={"request": MockRequest({"id": self.USER_ID}, self.app)},
+            executor=executor,
+        )
         with self.session_provider():
             newspaper = await self.newspaper_repository.get_one_filtered(name=self.TEST_NEWSPAPER)
             self.assertTrue(len(newspaper.follows))
-        client.execute(self.UNFOLLOW_NEWSPAPER_MUTATION,
-                       variable_values={
-                           'name': self.TEST_NEWSPAPER
-                       },
-                       context_value={'request': MockRequest({'id': self.USER_ID}, self.app)},
-                       executor=executor)
+        client.execute(
+            self.UNFOLLOW_NEWSPAPER_MUTATION,
+            variable_values={"name": self.TEST_NEWSPAPER},
+            context_value={"request": MockRequest({"id": self.USER_ID}, self.app)},
+            executor=executor,
+        )
         with self.session_provider():
             newspaper = await self.newspaper_repository.get_one_filtered(name=self.TEST_NEWSPAPER)
             self.assertFalse(len(newspaper.follows))
 
     @async_test
     async def test_unfollow_not_followed_newspaper(self):
-        await self.user_repository.save(User(id=2, username='test2'))
-        await self.user_repository.save(User(id=self.USER_ID, username='test'))
+        await self.user_repository.save(User(id=2, username="test2"))
+        await self.user_repository.save(User(id=self.USER_ID, username="test"))
         await self.newspaper_repository.save(Newspaper(name=self.TEST_NEWSPAPER, user_id=2))
         client = Client(schema)
         executor = AsyncioExecutor()
-        response = client.execute(self.UNFOLLOW_NEWSPAPER_MUTATION,
-                                  variable_values={
-                                       'name': self.TEST_NEWSPAPER
-                                  },
-                                  context_value={'request': MockRequest({'id': self.USER_ID}, self.app)},
-                                  executor=executor)
-        self.assertIn('errors', response)
-        self.assertGreater(len(response['errors']), 0)
+        response = client.execute(
+            self.UNFOLLOW_NEWSPAPER_MUTATION,
+            variable_values={"name": self.TEST_NEWSPAPER},
+            context_value={"request": MockRequest({"id": self.USER_ID}, self.app)},
+            executor=executor,
+        )
+        self.assertIn("errors", response)
+        self.assertGreater(len(response["errors"]), 0)

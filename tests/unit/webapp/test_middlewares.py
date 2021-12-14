@@ -20,7 +20,7 @@ class TestMiddlewares(TestCase):
         container.reset()
 
         self.apm_mock = Mock(spec=Client)
-        container.set('apm', self.apm_mock)
+        container.set("apm", self.apm_mock)
         app = Application()
         self.app = app
 
@@ -39,7 +39,7 @@ class TestMiddlewares(TestCase):
 
     @async_test
     async def test_error_middleware_httperror(self):
-        test_reason = 'test_reason'
+        test_reason = "test_reason"
         test_request = Mock(spec=Request)
 
         async def mock_handler(_):
@@ -53,7 +53,7 @@ class TestMiddlewares(TestCase):
 
     @async_test
     async def test_error_middleware_non_httperror(self):
-        test_reason = 'test_reason'
+        test_reason = "test_reason"
         test_request = Mock(spec=Request)
 
         async def mock_handler(_):

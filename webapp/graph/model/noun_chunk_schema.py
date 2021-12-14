@@ -15,5 +15,5 @@ class NounChunkFilter(FilterSet):
     class Meta:
         model = NounChunkModel
         fields = {
-            'value': [...],
+            "value": [...],
         }

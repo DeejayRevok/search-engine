@@ -16,4 +16,4 @@ class UserDeletedListener(EventListener):
             user = await self.__user_repository.get_one_filtered(id=uaa_id)
             await self.__user_repository.delete(user)
         except Exception as ex:
-            self.__logger.error(f'Error while deleting the view of the created user {ex}', exc_info=True)
+            self.__logger.error(f"Error while deleting the view of the created user {ex}", exc_info=True)

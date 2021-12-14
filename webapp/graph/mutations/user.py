@@ -18,17 +18,17 @@ class LikeNew(Mutation):
     ok = Boolean(description="True if the like creation was successful, False otherwise")
 
     class Arguments:
-        new_title = String(required=True, description='Title of the new to like')
+        new_title = String(required=True, description="Title of the new to like")
 
     @staticmethod
     @login_required
     async def mutate(_, info, new_title: str):
-        user_id: int = info.context['request'].user['id']
+        user_id: int = info.context["request"].user["id"]
 
-        new_repository: NewRepository = container.get('new_repository')
-        user_repository: UserRepository = container.get('user_repository')
+        new_repository: NewRepository = container.get("new_repository")
+        user_repository: UserRepository = container.get("user_repository")
 
-        with container.get('session_provider')(read_only=False):
+        with container.get("session_provider")(read_only=False):
             new: NewModel = await new_repository.get_one_filtered(title=new_title)
             if new:
                 user: UserModel = await user_repository.get_one_filtered(id=user_id)
@@ -37,24 +37,24 @@ class LikeNew(Mutation):
 
                 return LikeNew(ok=True)
             else:
-                raise ValueError(f'New {new_title} not found')
+                raise ValueError(f"New {new_title} not found")
 
 
 class DeleteNewLike(Mutation):
     ok = Boolean(description="True if the like deletion was successful, False otherwise")
 
     class Arguments:
-        new_title = String(required=True, description='Title of the new to delete like')
+        new_title = String(required=True, description="Title of the new to delete like")
 
     @staticmethod
     @login_required
     async def mutate(_, info: ResolveInfo, new_title: str):
-        user_id: int = info.context['request'].user['id']
+        user_id: int = info.context["request"].user["id"]
 
-        new_repository: NewRepository = container.get('new_repository')
-        user_repository: UserRepository = container.get('user_repository')
+        new_repository: NewRepository = container.get("new_repository")
+        user_repository: UserRepository = container.get("user_repository")
 
-        with container.get('session_provider')(read_only=False):
+        with container.get("session_provider")(read_only=False):
             new: NewModel = await new_repository.get_one_filtered(title=new_title)
             if new:
                 user: UserModel = await user_repository.get_one_filtered(id=user_id)
@@ -63,26 +63,26 @@ class DeleteNewLike(Mutation):
                     await user_repository.save(user)
                     return DeleteNewLike(ok=True)
                 else:
-                    raise ValueError(f'New {new_title} not liked yet')
+                    raise ValueError(f"New {new_title} not liked yet")
             else:
-                raise ValueError(f'New {new_title} not found')
+                raise ValueError(f"New {new_title} not found")
 
 
 class FollowNewspaper(Mutation):
     ok = Boolean(description="True if the follow creation was successful, False otherwise")
 
     class Arguments:
-        newspaper_name = String(required=True, description='Name of the newspaper to follow')
+        newspaper_name = String(required=True, description="Name of the newspaper to follow")
 
     @staticmethod
     @login_required
     async def mutate(_, info, newspaper_name: str):
-        user_id: int = info.context['request'].user['id']
+        user_id: int = info.context["request"].user["id"]
 
-        newspaper_repository: NewspaperRepository = container.get('newspaper_repository')
-        user_repository: UserRepository = container.get('user_repository')
+        newspaper_repository: NewspaperRepository = container.get("newspaper_repository")
+        user_repository: UserRepository = container.get("user_repository")
 
-        with container.get('session_provider')(read_only=False):
+        with container.get("session_provider")(read_only=False):
             newspaper: NewspaperModel = await newspaper_repository.get_one_filtered(name=newspaper_name)
             if newspaper:
                 user: UserModel = await user_repository.get_one_filtered(id=user_id)
@@ -92,26 +92,26 @@ class FollowNewspaper(Mutation):
 
                     return FollowNewspaper(ok=True)
                 else:
-                    raise ValueError(f'Impossible to follow your own newspaper')
+                    raise ValueError(f"Impossible to follow your own newspaper")
             else:
-                raise ValueError(f'Newspaper {newspaper_name} not found')
+                raise ValueError(f"Newspaper {newspaper_name} not found")
 
 
 class UnfollowNewspaper(Mutation):
     ok = Boolean(description="True if the unfollow was successful, False otherwise")
 
     class Arguments:
-        newspaper_name = String(required=True, description='Name of the newspaper to unfollow')
+        newspaper_name = String(required=True, description="Name of the newspaper to unfollow")
 
     @staticmethod
     @login_required
     async def mutate(_, info: ResolveInfo, newspaper_name: str):
-        user_id: int = info.context['request'].user['id']
+        user_id: int = info.context["request"].user["id"]
 
-        newspaper_repository: NewspaperRepository = container.get('newspaper_repository')
-        user_repository: UserRepository = container.get('user_repository')
+        newspaper_repository: NewspaperRepository = container.get("newspaper_repository")
+        user_repository: UserRepository = container.get("user_repository")
 
-        with container.get('session_provider')(read_only=False):
+        with container.get("session_provider")(read_only=False):
             newspaper: NewspaperModel = await newspaper_repository.get_one_filtered(name=newspaper_name)
             if newspaper:
                 user: UserModel = await user_repository.get_one_filtered(id=user_id)
@@ -120,26 +120,26 @@ class UnfollowNewspaper(Mutation):
                     await user_repository.save(user)
                     return UnfollowNewspaper(ok=True)
                 else:
-                    raise ValueError('Newspaper not followed yet')
+                    raise ValueError("Newspaper not followed yet")
             else:
-                raise ValueError(f'Newspaper {newspaper_name} not found')
+                raise ValueError(f"Newspaper {newspaper_name} not found")
 
 
 class FollowSource(Mutation):
     ok = Boolean(description="True if the source follow was successful, False otherwise")
 
     class Arguments:
-        source_name = String(required=True, description='Name of the source to follow')
+        source_name = String(required=True, description="Name of the source to follow")
 
     @staticmethod
     @login_required
     async def mutate(_, info, source_name: str):
-        user_id: int = info.context['request'].user['id']
+        user_id: int = info.context["request"].user["id"]
 
-        source_repository: SourceRepository = container.get('source_repository')
-        user_repository: UserRepository = container.get('user_repository')
+        source_repository: SourceRepository = container.get("source_repository")
+        user_repository: UserRepository = container.get("user_repository")
 
-        with container.get('session_provider')(read_only=False):
+        with container.get("session_provider")(read_only=False):
             source: SourceModel = await source_repository.get_one_filtered(name=source_name)
             if source:
                 user: UserModel = await user_repository.get_one_filtered(id=user_id)
@@ -148,24 +148,24 @@ class FollowSource(Mutation):
 
                 return FollowSource(ok=True)
             else:
-                raise ValueError(f'Source {source_name} not found')
+                raise ValueError(f"Source {source_name} not found")
 
 
 class UnfollowSource(Mutation):
     ok = Boolean(description="True if the unfollow was successful, False otherwise")
 
     class Arguments:
-        source_name = String(required=True, description='Name of the source to unfollow')
+        source_name = String(required=True, description="Name of the source to unfollow")
 
     @staticmethod
     @login_required
     async def mutate(_, info: ResolveInfo, source_name: str):
-        user_id: int = info.context['request'].user['id']
+        user_id: int = info.context["request"].user["id"]
 
-        source_repository: SourceRepository = container.get('source_repository')
-        user_repository: UserRepository = container.get('user_repository')
+        source_repository: SourceRepository = container.get("source_repository")
+        user_repository: UserRepository = container.get("user_repository")
 
-        with container.get('session_provider')(read_only=False):
+        with container.get("session_provider")(read_only=False):
             source: SourceModel = await source_repository.get_one_filtered(name=source_name)
             if source:
                 user: UserModel = await user_repository.get_one_filtered(id=user_id)
@@ -174,26 +174,26 @@ class UnfollowSource(Mutation):
                     await user_repository.save(user)
                     return UnfollowSource(ok=True)
                 else:
-                    raise ValueError('Source not followed yet')
+                    raise ValueError("Source not followed yet")
             else:
-                raise ValueError(f'Source {source_name} not found')
+                raise ValueError(f"Source {source_name} not found")
 
 
 class CreateUserNew(Mutation):
     ok = Boolean(description="True if the association creation was successful, False otherwise")
 
     class Arguments:
-        new_title = String(required=True, description='Title of the new to associate with the user')
+        new_title = String(required=True, description="Title of the new to associate with the user")
 
     @staticmethod
     @login_required
     async def mutate(_, info, new_title: str):
-        user_id: int = info.context['request'].user['id']
+        user_id: int = info.context["request"].user["id"]
 
-        new_repository: NewRepository = container.get('new_repository')
-        user_repository: UserRepository = container.get('user_repository')
+        new_repository: NewRepository = container.get("new_repository")
+        user_repository: UserRepository = container.get("user_repository")
 
-        with container.get('session_provider')(read_only=False):
+        with container.get("session_provider")(read_only=False):
             new: NewModel = await new_repository.get_one_filtered(title=new_title)
             if new:
                 user: UserModel = await user_repository.get_one_filtered(id=user_id)
@@ -202,24 +202,24 @@ class CreateUserNew(Mutation):
 
                 return CreateUserNew(ok=True)
             else:
-                raise ValueError(f'New {new_title} not found')
+                raise ValueError(f"New {new_title} not found")
 
 
 class DeleteUserNew(Mutation):
     ok = Boolean(description="True if the association deletion was successful, False otherwise")
 
     class Arguments:
-        new_title = String(required=True, description='Title of the new association to delete')
+        new_title = String(required=True, description="Title of the new association to delete")
 
     @staticmethod
     @login_required
     async def mutate(_, info: ResolveInfo, new_title: str):
-        user_id: int = info.context['request'].user['id']
+        user_id: int = info.context["request"].user["id"]
 
-        new_repository: NewRepository = container.get('new_repository')
-        user_repository: UserRepository = container.get('user_repository')
+        new_repository: NewRepository = container.get("new_repository")
+        user_repository: UserRepository = container.get("user_repository")
 
-        with container.get('session_provider')(read_only=False):
+        with container.get("session_provider")(read_only=False):
             new: NewModel = await new_repository.get_one_filtered(title=new_title)
             if new:
                 user: UserModel = await user_repository.get_one_filtered(id=user_id)
@@ -228,9 +228,9 @@ class DeleteUserNew(Mutation):
                     await user_repository.save(user)
                     return DeleteUserNew(ok=True)
                 else:
-                    raise ValueError('User new association not found')
+                    raise ValueError("User new association not found")
             else:
-                raise ValueError(f'New {new_title} not found')
+                raise ValueError(f"New {new_title} not found")
 
 
 class UserMutations(ObjectType):

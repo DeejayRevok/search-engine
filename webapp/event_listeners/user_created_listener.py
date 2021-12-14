@@ -16,4 +16,4 @@ class UserCreatedListener(EventListener):
         try:
             await self.__user_repository.save(User(id=uaa_id, username=username))
         except Exception as ex:
-            self.__logger.error(f'Error while saving the view of the created user {ex}', exc_info=True)
+            self.__logger.error(f"Error while saving the view of the created user {ex}", exc_info=True)

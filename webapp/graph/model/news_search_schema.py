@@ -14,38 +14,44 @@ class NewsSearch(ObjectType):
     class Meta:
         interfaces = (SearchTracker,)
 
-    result: List[NewSchema] = GraphList(NewSchema, description='News searching results')
-    union: NewsSearch = Field(lambda: NewsSearch,
-                              named_entity=String(required=False),
-                              noun_chunk=String(required=False),
-                              description="Union search term")
-    intersection: NewsSearch = Field(lambda: NewsSearch,
-                                     named_entity=String(required=False),
-                                     noun_chunk=String(required=False),
-                                     description="Intersection search term")
+    result: List[NewSchema] = GraphList(NewSchema, description="News searching results")
+    union: NewsSearch = Field(
+        lambda: NewsSearch,
+        named_entity=String(required=False),
+        noun_chunk=String(required=False),
+        description="Union search term",
+    )
+    intersection: NewsSearch = Field(
+        lambda: NewsSearch,
+        named_entity=String(required=False),
+        noun_chunk=String(required=False),
+        description="Intersection search term",
+    )
 
     @staticmethod
-    async def search_resolver(operation: SearchOperation, root, info: ResolveInfo, named_entity: str = None,
-                              noun_chunk: str = None) -> NewsSearch:
+    async def search_resolver(
+        operation: SearchOperation, root, info: ResolveInfo, named_entity: str = None, noun_chunk: str = None
+    ) -> NewsSearch:
         if not named_entity and not noun_chunk:
-            raise ValueError('Input union search filter missing')
+            raise ValueError("Input union search filter missing")
         if named_entity and noun_chunk:
-            raise ValueError('Multiple input filters')
+            raise ValueError("Multiple input filters")
 
         query: Query = NewSchema.get_query(info)
         previous_track_info = root.track_info
 
         aggregated_track_info = None
         if named_entity is not None:
-            aggregated_track_info = TrackInfo(operation=operation,
-                                              field=SearchField.NAMED_ENTITY,
-                                              value=named_entity,
-                                              previous_track=previous_track_info)
+            aggregated_track_info = TrackInfo(
+                operation=operation,
+                field=SearchField.NAMED_ENTITY,
+                value=named_entity,
+                previous_track=previous_track_info,
+            )
         elif noun_chunk is not None:
-            aggregated_track_info = TrackInfo(operation=operation,
-                                              field=SearchField.NOUN_CHUNK,
-                                              value=noun_chunk,
-                                              previous_track=previous_track_info)
+            aggregated_track_info = TrackInfo(
+                operation=operation, field=SearchField.NOUN_CHUNK, value=noun_chunk, previous_track=previous_track_info
+            )
 
         search_result = NewsSearch(result=list(SearchTracker.tracking_query(aggregated_track_info, query)))
         search_result.track_info = aggregated_track_info
@@ -54,12 +60,15 @@ class NewsSearch(ObjectType):
     @staticmethod
     @login_required
     async def resolve_union(root, info: ResolveInfo, named_entity: str = None, noun_chunk: str = None) -> NewsSearch:
-        return await NewsSearch.search_resolver(SearchOperation.UNION, root, info, named_entity=named_entity,
-                                                noun_chunk=noun_chunk)
+        return await NewsSearch.search_resolver(
+            SearchOperation.UNION, root, info, named_entity=named_entity, noun_chunk=noun_chunk
+        )
 
     @staticmethod
     @login_required
-    async def resolve_intersection(root, info: ResolveInfo, named_entity: str = None,
-                                   noun_chunk: str = None) -> NewsSearch:
-        return await NewsSearch.search_resolver(SearchOperation.INTERSECTION, root, info, named_entity=named_entity,
-                                                noun_chunk=noun_chunk)
+    async def resolve_intersection(
+        root, info: ResolveInfo, named_entity: str = None, noun_chunk: str = None
+    ) -> NewsSearch:
+        return await NewsSearch.search_resolver(
+            SearchOperation.INTERSECTION, root, info, named_entity=named_entity, noun_chunk=noun_chunk
+        )

@@ -17,14 +17,27 @@ class TestNewsSearch(TestCase):
         BASE.metadata.create_all()
 
     def test_searchable_tracking_query(self):
-        first_track_info = TrackInfo(operation=SearchOperation.UNION, field=SearchField.NAMED_ENTITY,
-                                     value='test_first', previous_track=None)
-        second_track_info = TrackInfo(operation=SearchOperation.INTERSECTION, field=SearchField.NOUN_CHUNK,
-                                      value='test_second', previous_track=first_track_info)
-        third_track_info = TrackInfo(operation=SearchOperation.INTERSECTION, field=SearchField.NOUN_CHUNK,
-                                     value='test_third', previous_track=second_track_info)
-        fourth_track_info = TrackInfo(operation=SearchOperation.UNION, field=SearchField.NAMED_ENTITY,
-                                      value='test_fourth', previous_track=third_track_info)
+        first_track_info = TrackInfo(
+            operation=SearchOperation.UNION, field=SearchField.NAMED_ENTITY, value="test_first", previous_track=None
+        )
+        second_track_info = TrackInfo(
+            operation=SearchOperation.INTERSECTION,
+            field=SearchField.NOUN_CHUNK,
+            value="test_second",
+            previous_track=first_track_info,
+        )
+        third_track_info = TrackInfo(
+            operation=SearchOperation.INTERSECTION,
+            field=SearchField.NOUN_CHUNK,
+            value="test_third",
+            previous_track=second_track_info,
+        )
+        fourth_track_info = TrackInfo(
+            operation=SearchOperation.UNION,
+            field=SearchField.NAMED_ENTITY,
+            value="test_fourth",
+            previous_track=third_track_info,
+        )
 
         self.assertEqual(first_track_info.next, second_track_info)
         self.assertEqual(second_track_info.next, third_track_info)
@@ -32,5 +45,5 @@ class TestNewsSearch(TestCase):
 
         full_tracking_query = SearchTracker.tracking_query(third_track_info, New.query)
         self.assertIsNotNone(full_tracking_query)
-        self.assertTrue(str(full_tracking_query).count('JOIN noun_chunk'), 2)
-        self.assertIn('UNION', str(full_tracking_query))
+        self.assertTrue(str(full_tracking_query).count("JOIN noun_chunk"), 2)
+        self.assertIn("UNION", str(full_tracking_query))

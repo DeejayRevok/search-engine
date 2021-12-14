@@ -4,8 +4,8 @@ from sqlalchemy.orm import Query
 
 
 class SearchOperation(Enum):
-    UNION = ('union', True)
-    INTERSECTION = ('join', False)
+    UNION = ("union", True)
+    INTERSECTION = ("join", False)
 
     @property
     def callable_name(self) -> str:

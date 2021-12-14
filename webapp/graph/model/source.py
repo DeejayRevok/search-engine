@@ -14,6 +14,4 @@ class Source(SQLAlchemyObjectType):
 class SourceFilter(FilterSet):
     class Meta:
         model = SourceModel
-        fields = {
-            'name': [...]
-        }
+        fields = {"name": [...]}

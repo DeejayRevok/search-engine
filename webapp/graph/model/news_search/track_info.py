@@ -12,8 +12,15 @@ class TrackInfo(ObjectType):
     field = String()
     value = String()
 
-    def __init__(self, operation: SearchOperation, field: SearchField, value: Any, previous_track: Optional[TrackInfo],
-                 *args, **kwargs):
+    def __init__(
+        self,
+        operation: SearchOperation,
+        field: SearchField,
+        value: Any,
+        previous_track: Optional[TrackInfo],
+        *args,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         self.previous = previous_track
         self.operation = operation

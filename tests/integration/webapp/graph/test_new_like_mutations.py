@@ -31,22 +31,22 @@ class MockRequest:
 
 class TestNewLikeMutations(TestCase):
     USER_ID = 1
-    TEST_NEW = 'test_new'
-    LIKE_NEW_MUTATION = '''
+    TEST_NEW = "test_new"
+    LIKE_NEW_MUTATION = """
                 mutation LikeNew($title: String!){
                     likeNew(newTitle: $title){
                         ok
                     }
                 }
-            '''
+            """
 
-    DELETE_LIKE_MUTATION = '''
+    DELETE_LIKE_MUTATION = """
                     mutation DeleteLikeNew($title: String!){
                         deleteNewLike(newTitle: $title){
                             ok
                         }
                     }
-                '''
+                """
 
     def setUp(self) -> None:
         container.reset()
@@ -62,76 +62,76 @@ class TestNewLikeMutations(TestCase):
         self.source_repository = SourceRepository(self.session_provider, logger)
 
         app = Application()
-        container.set('session_provider', self.session_provider)
-        container.set('new_repository', self.new_repository)
-        container.set('user_repository', self.user_repository)
+        container.set("session_provider", self.session_provider)
+        container.set("new_repository", self.new_repository)
+        container.set("user_repository", self.user_repository)
         self.app = app
 
     @async_test
     async def test_like_new_success(self):
-        await self.source_repository.save(Source(name='test_source'))
-        await self.user_repository.save(User(id=self.USER_ID, username='test'))
-        await self.new_repository.save(New(title=self.TEST_NEW, url='test_url', sentiment=0.0, source_id=1))
+        await self.source_repository.save(Source(name="test_source"))
+        await self.user_repository.save(User(id=self.USER_ID, username="test"))
+        await self.new_repository.save(New(title=self.TEST_NEW, url="test_url", sentiment=0.0, source_id=1))
         client = Client(schema)
-        client.execute(self.LIKE_NEW_MUTATION,
-                       variable_values={
-                         'title': self.TEST_NEW
-                       },
-                       context_value={'request': MockRequest({'id': self.USER_ID}, self.app)},
-                       executor=AsyncioExecutor())
+        client.execute(
+            self.LIKE_NEW_MUTATION,
+            variable_values={"title": self.TEST_NEW},
+            context_value={"request": MockRequest({"id": self.USER_ID}, self.app)},
+            executor=AsyncioExecutor(),
+        )
         with self.session_provider():
             new = await self.new_repository.get_one_filtered(title=self.TEST_NEW)
             self.assertTrue(len(new.likes))
 
     @async_test
     async def test_like_unexisting_new(self):
-        await self.user_repository.save(User(id=self.USER_ID, username='test'))
+        await self.user_repository.save(User(id=self.USER_ID, username="test"))
         client = Client(schema)
-        response = client.execute(self.LIKE_NEW_MUTATION,
-                                  variable_values={
-                                     'title': 'unexisting_new'
-                                  },
-                                  context_value={'request': MockRequest({'id': self.USER_ID}, self.app)},
-                                  executor=AsyncioExecutor())
-        self.assertIn('errors', response)
-        self.assertGreater(len(response['errors']), 0)
+        response = client.execute(
+            self.LIKE_NEW_MUTATION,
+            variable_values={"title": "unexisting_new"},
+            context_value={"request": MockRequest({"id": self.USER_ID}, self.app)},
+            executor=AsyncioExecutor(),
+        )
+        self.assertIn("errors", response)
+        self.assertGreater(len(response["errors"]), 0)
 
     @async_test
     async def test_delete_new_like(self):
-        await self.source_repository.save(Source(name='test_source'))
-        await self.user_repository.save(User(id=self.USER_ID, username='test'))
-        await self.new_repository.save(New(title=self.TEST_NEW, url='test_url', sentiment=0.0, source_id=1))
+        await self.source_repository.save(Source(name="test_source"))
+        await self.user_repository.save(User(id=self.USER_ID, username="test"))
+        await self.new_repository.save(New(title=self.TEST_NEW, url="test_url", sentiment=0.0, source_id=1))
         client = Client(schema)
         executor = AsyncioExecutor()
-        client.execute(self.LIKE_NEW_MUTATION,
-                       variable_values={
-                           'title': self.TEST_NEW
-                       },
-                       context_value={'request': MockRequest({'id': self.USER_ID}, self.app)},
-                       executor=executor)
+        client.execute(
+            self.LIKE_NEW_MUTATION,
+            variable_values={"title": self.TEST_NEW},
+            context_value={"request": MockRequest({"id": self.USER_ID}, self.app)},
+            executor=executor,
+        )
         with self.session_provider():
             new = await self.new_repository.get_one_filtered(title=self.TEST_NEW)
             self.assertTrue(len(new.likes))
-        client.execute(self.DELETE_LIKE_MUTATION,
-                       variable_values={
-                           'title': self.TEST_NEW
-                       },
-                       context_value={'request': MockRequest({'id': self.USER_ID}, self.app)},
-                       executor=executor)
+        client.execute(
+            self.DELETE_LIKE_MUTATION,
+            variable_values={"title": self.TEST_NEW},
+            context_value={"request": MockRequest({"id": self.USER_ID}, self.app)},
+            executor=executor,
+        )
         with self.session_provider():
             new = await self.new_repository.get_one_filtered(title=self.TEST_NEW)
             self.assertFalse(len(new.likes))
 
     @async_test
     async def test_deleting_like_not_created(self):
-        await self.user_repository.save(User(id=self.USER_ID, username='test'))
+        await self.user_repository.save(User(id=self.USER_ID, username="test"))
         client = Client(schema)
         executor = AsyncioExecutor()
-        response = client.execute(self.DELETE_LIKE_MUTATION,
-                                  variable_values={
-                                       'title': self.TEST_NEW
-                                  },
-                                  context_value={'request': MockRequest({'id': self.USER_ID}, self.app)},
-                                  executor=executor)
-        self.assertIn('errors', response)
-        self.assertGreater(len(response['errors']), 0)
+        response = client.execute(
+            self.DELETE_LIKE_MUTATION,
+            variable_values={"title": self.TEST_NEW},
+            context_value={"request": MockRequest({"id": self.USER_ID}, self.app)},
+            executor=executor,
+        )
+        self.assertIn("errors", response)
+        self.assertGreater(len(response["errors"]), 0)

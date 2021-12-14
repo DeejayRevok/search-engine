@@ -32,25 +32,33 @@ LOGGER = getLogger()
 
 TEST_ENTITY_TYPE_1 = "Test entity type 1"
 TEST_ENTITY_TYPE_2 = "Test entity type 2"
-TEST_NEW = New(title="Test title",
-               url='https://test.test',
-               content="Test content",
-               source="Test source",
-               sentiment=3.4,
-               date=23452435.0,
-               language=Language.ENGLISH.value,
-               entities=[NamedEntity(text="Test entity 1", type=TEST_ENTITY_TYPE_1),
-                         NamedEntity(text="Test entity 2", type=TEST_ENTITY_TYPE_1)])
+TEST_NEW = New(
+    title="Test title",
+    url="https://test.test",
+    content="Test content",
+    source="Test source",
+    sentiment=3.4,
+    date=23452435.0,
+    language=Language.ENGLISH.value,
+    entities=[
+        NamedEntity(text="Test entity 1", type=TEST_ENTITY_TYPE_1),
+        NamedEntity(text="Test entity 2", type=TEST_ENTITY_TYPE_1),
+    ],
+)
 
-TEST_NEW_2 = New(title="Test title 2",
-                 url='https://test2.test',
-                 content="Test content",
-                 source="Test source",
-                 sentiment=4.6,
-                 date=2323452345.0,
-                 language=Language.ENGLISH.value,
-                 entities=[NamedEntity(text="Test entity 3", type=TEST_ENTITY_TYPE_1),
-                           NamedEntity(text="Test entity 4", type=TEST_ENTITY_TYPE_2)])
+TEST_NEW_2 = New(
+    title="Test title 2",
+    url="https://test2.test",
+    content="Test content",
+    source="Test source",
+    sentiment=4.6,
+    date=2323452345.0,
+    language=Language.ENGLISH.value,
+    entities=[
+        NamedEntity(text="Test entity 3", type=TEST_ENTITY_TYPE_1),
+        NamedEntity(text="Test entity 4", type=TEST_ENTITY_TYPE_2),
+    ],
+)
 
 
 class TestIndexService(TestCase):
@@ -58,13 +66,13 @@ class TestIndexService(TestCase):
     def setUpClass(cls) -> None:
         settings_loader(config, filename=TEST_CONFIG_PATH)
 
-    @patch('services.index_service.Process')
-    @patch('services.index_service.ExchangeConsumer')
+    @patch("services.index_service.Process")
+    @patch("services.index_service.ExchangeConsumer")
     def setUp(self, consumer_mock, process_mock) -> None:
         container.reset()
 
         self.apm_mock = Mock(spec=Client)
-        container.set('apm', self.apm_mock)
+        container.set("apm", self.apm_mock)
         self.consumer_mock = consumer_mock
         self.process_mock = process_mock
         self.app = Application()
@@ -85,7 +93,7 @@ class TestIndexService(TestCase):
 
     def test_initialize_service(self):
         self.consumer_mock.assert_called_once()
-        if platform.system() != 'Windows':
+        if platform.system() != "Windows":
             self.process_mock.assert_called_with(target=self.consumer_mock().__call__)
             self.process_mock().start.assert_called_once()
 
@@ -152,7 +160,7 @@ class TestIndexService(TestCase):
 
     def test_index_message_fail(self):
         async def index_new_mock_async(*_):
-            raise Exception('Test exception')
+            raise Exception("Test exception")
 
         self.index_service.index_new = index_new_mock_async
 
@@ -166,5 +174,5 @@ class TestIndexService(TestCase):
     async def test_shutdown(self):
         await self.index_service.shutdown()
         self.consumer_mock().shutdown.assert_called_once()
-        if platform.system() != 'Windows':
+        if platform.system() != "Windows":
             self.process_mock().join.assert_called_once()

@@ -14,7 +14,4 @@ class NamedEntityType(SQLAlchemyObjectType):
 class NamedEntityTypeFilter(FilterSet):
     class Meta:
         model = NamedEntityTypeModel
-        fields = {
-            'name': [...],
-            'description': [...]
-        }
+        fields = {"name": [...], "description": [...]}

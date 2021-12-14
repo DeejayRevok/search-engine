@@ -20,38 +20,39 @@ LOGGER = get_logger()
 
 async def _associate(association_service: CRUDRepository, association_value: str, newspaper: NewspaperModel):
     association_entity: Union[NamedEntityModel, NounChunkModel] = await association_service.get_one_filtered(
-        value=association_value)
+        value=association_value
+    )
     if association_entity:
         association_entity.newspapers.append(newspaper)
     else:
-        LOGGER.warning('Association entity %s not found', association_value)
+        LOGGER.warning("Association entity %s not found", association_value)
 
 
 class CreateNewspaper(Mutation):
     name = String(description="Name of the created newspaper")
 
     class Arguments:
-        name = String(required=True, description='Newspaper name')
+        name = String(required=True, description="Newspaper name")
         named_entities = GraphList(String, required=False, description="Newspaper search named entities")
         noun_chunks = GraphList(String, required=False, description="Newspaper search noun chunks")
 
     @staticmethod
     @login_required
     async def mutate(_, info, name: str, named_entities: List[str] = None, noun_chunks: List[str] = None):
-        user_id: int = info.context['request'].user['id']
+        user_id: int = info.context["request"].user["id"]
 
-        session_provider: SqlSessionProvider = container.get('session_provider')
-        newspaper_repository: NewspaperRepository = container.get('newspaper_repository')
+        session_provider: SqlSessionProvider = container.get("session_provider")
+        newspaper_repository: NewspaperRepository = container.get("newspaper_repository")
 
         with session_provider(read_only=False):
             newspaper: NewspaperModel = await newspaper_repository.save(Newspaper(name=name, user_id=user_id))
 
             if named_entities:
-                named_entity_repository: NamedEntityRepository = container.get('named_entity_repository')
+                named_entity_repository: NamedEntityRepository = container.get("named_entity_repository")
                 for named_entity_val in named_entities:
                     await _associate(named_entity_repository, named_entity_val, newspaper)
             if noun_chunks:
-                noun_chunks_repository: NounChunkRepository = container.get('noun_chunk_repository')
+                noun_chunks_repository: NounChunkRepository = container.get("noun_chunk_repository")
                 for noun_chunk_val in noun_chunks:
                     await _associate(noun_chunks_repository, noun_chunk_val, newspaper)
 
@@ -62,15 +63,18 @@ class UpdateNewspaper(Mutation):
     name = String(description="Name of the updated newspaper")
 
     class Arguments:
-        original_name = String(required=True, description='Newspaper original name')
-        update_name = String(required=False, description='Newspaper updated name')
+        original_name = String(required=True, description="Newspaper original name")
+        update_name = String(required=False, description="Newspaper updated name")
         named_entities = GraphList(String, required=False, description="Newspaper updated named entities")
         noun_chunks = GraphList(String, required=False, description="Newspaper updated noun chunks")
 
     @staticmethod
-    async def _update_association(association_entities: Optional[List[str]],
-                                  association_service: CRUDRepository, newspaper: NewspaperModel,
-                                  newspaper_assocation: List):
+    async def _update_association(
+        association_entities: Optional[List[str]],
+        association_service: CRUDRepository,
+        newspaper: NewspaperModel,
+        newspaper_assocation: List,
+    ):
         if association_entities is not None:
             delete_associations = list()
             for association in newspaper_assocation:
@@ -87,11 +91,17 @@ class UpdateNewspaper(Mutation):
 
     @staticmethod
     @login_required
-    async def mutate(_, __, original_name: str, update_name: str = None, named_entities: List[str] = None,
-                     noun_chunks: List[str] = None):
+    async def mutate(
+        _,
+        __,
+        original_name: str,
+        update_name: str = None,
+        named_entities: List[str] = None,
+        noun_chunks: List[str] = None,
+    ):
         if original_name and (update_name is not None or named_entities is not None or noun_chunks is not None):
-            session_provider: SqlSessionProvider = container.get('session_provider')
-            newspaper_service: NewspaperRepository = container.get('newspaper_repository')
+            session_provider: SqlSessionProvider = container.get("session_provider")
+            newspaper_service: NewspaperRepository = container.get("newspaper_repository")
 
             with session_provider(read_only=False):
                 newspaper: NewspaperModel = await newspaper_service.get_one_filtered(name=original_name)
@@ -99,15 +109,17 @@ class UpdateNewspaper(Mutation):
                     if update_name:
                         newspaper.name = update_name
 
-                    named_entity_repository: NamedEntityRepository = container.get('named_entity_repository')
-                    await UpdateNewspaper._update_association(named_entities, named_entity_repository, newspaper,
-                                                              newspaper.named_entities)
+                    named_entity_repository: NamedEntityRepository = container.get("named_entity_repository")
+                    await UpdateNewspaper._update_association(
+                        named_entities, named_entity_repository, newspaper, newspaper.named_entities
+                    )
 
-                    noun_chunks_repository: NounChunkRepository = container.get('noun_chunk_repository')
-                    await UpdateNewspaper._update_association(noun_chunks, noun_chunks_repository, newspaper,
-                                                              newspaper.noun_chunks)
+                    noun_chunks_repository: NounChunkRepository = container.get("noun_chunk_repository")
+                    await UpdateNewspaper._update_association(
+                        noun_chunks, noun_chunks_repository, newspaper, newspaper.noun_chunks
+                    )
                 else:
-                    raise ValueError(f'Newspaper {original_name} not found')
+                    raise ValueError(f"Newspaper {original_name} not found")
 
             return UpdateNewspaper(name=newspaper.name)
         else:
@@ -118,19 +130,19 @@ class DeleteNewspaper(Mutation):
     ok = Boolean()
 
     class Arguments:
-        name = String(required=True, description='Name of the newspaper to delete')
+        name = String(required=True, description="Name of the newspaper to delete")
 
     @staticmethod
     @login_required
     async def mutate(_, __, name: str):
-        newspaper_repository: NewspaperRepository = container.get('newspaper_repository')
+        newspaper_repository: NewspaperRepository = container.get("newspaper_repository")
 
         delete_newspaper: NewspaperModel = await newspaper_repository.get_one_filtered(name=name)
         if delete_newspaper:
             await newspaper_repository.delete(delete_newspaper)
             return DeleteNewspaper(ok=True)
         else:
-            raise ValueError(f'Newspaper {name} not found')
+            raise ValueError(f"Newspaper {name} not found")
 
 
 class NewspaperMutations(ObjectType):

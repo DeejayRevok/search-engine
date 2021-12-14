@@ -9,12 +9,12 @@ class NamedEntitySchema(SQLAlchemyObjectType):
     class Meta:
         model = NamedEntityModel
         interfaces = (Node,)
-        exclude_fields = ('named_entity_type_id',)
+        exclude_fields = ("named_entity_type_id",)
 
 
 class NamedEntityFilter(FilterSet):
     class Meta:
         model = NamedEntityModel
         fields = {
-            'value': [...],
+            "value": [...],
         }

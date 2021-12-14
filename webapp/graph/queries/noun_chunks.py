@@ -10,8 +10,9 @@ from webapp.graph.utils.authenticated_filterable_field import AuthenticatedFilte
 
 
 class NounChunkQueries(ObjectType):
-    noun_chunks: List[NounChunkSchema] = AuthenticatedFilterableField(NounChunkSchema.connection,
-                                                                         filters=NounChunkFilter())
+    noun_chunks: List[NounChunkSchema] = AuthenticatedFilterableField(
+        NounChunkSchema.connection, filters=NounChunkFilter()
+    )
     noun_chunk: NounChunkSchema = Field(NounChunkSchema, value=String())
 
     @staticmethod

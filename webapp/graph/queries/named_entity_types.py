@@ -10,8 +10,9 @@ from webapp.graph.utils.authenticated_filterable_field import AuthenticatedFilte
 
 
 class NamedEntityTypeQueries(ObjectType):
-    named_entity_types: List[NamedEntityType] = AuthenticatedFilterableField(NamedEntityType.connection,
-                                                                             filters=NamedEntityTypeFilter())
+    named_entity_types: List[NamedEntityType] = AuthenticatedFilterableField(
+        NamedEntityType.connection, filters=NamedEntityTypeFilter()
+    )
     named_entity_type: NamedEntityType = Field(NamedEntityType, name=String())
 
     @staticmethod

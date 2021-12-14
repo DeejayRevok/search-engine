@@ -11,7 +11,8 @@ from services.news_manager_service import NewsManagerService
 
 class TestNewsManagerService(TestCase):
 
-    GET_NEW_BY_TITLE_QUERY = gql('''
+    GET_NEW_BY_TITLE_QUERY = gql(
+        """
         query getNewByTitle($searchTitle: String!) {
             new(title: $searchTitle){
                 title
@@ -29,17 +30,19 @@ class TestNewsManagerService(TestCase):
                 nounChunks
             }
         }
-    ''')
+    """
+    )
 
-    @patch('services.news_manager_service.RequestsHTTPTransport')
-    @patch('services.news_manager_service.encode')
-    @patch('services.news_manager_service.Client')
+    @patch("services.news_manager_service.RequestsHTTPTransport")
+    @patch("services.news_manager_service.encode")
+    @patch("services.news_manager_service.Client")
     @async_test
     async def test_get_new_title(self, mock_gql_client, encode_mock, _):
         encode_mock.return_value = "test_token_encoded"
-        news_manager_service = NewsManagerService('test', 'test', 'test', "test", getLogger())
+        news_manager_service = NewsManagerService("test", "test", "test", "test", getLogger())
 
-        test_title = 'Test title'
+        test_title = "Test title"
         await news_manager_service.get_new_by_title(test_title)
-        mock_gql_client().execute.assert_called_with(self.GET_NEW_BY_TITLE_QUERY,
-                                                     variable_values=dict(searchTitle=test_title))
+        mock_gql_client().execute.assert_called_with(
+            self.GET_NEW_BY_TITLE_QUERY, variable_values=dict(searchTitle=test_title)
+        )

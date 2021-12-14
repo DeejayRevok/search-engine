@@ -43,5 +43,7 @@ class CRUDRepository:
             with self.__session_provider(read_only=False) as session:
                 session.query(self._ENTITY_CLASS).filter_by(id=entity.id).delete()
         except Exception as ex:
-            self.__logger.error(f"Error while trying to delete {self._ENTITY_CLASS.__class__.__name__}{entity.id}: {str(ex)}")
+            self.__logger.error(
+                f"Error while trying to delete {self._ENTITY_CLASS.__class__.__name__}{entity.id}: {str(ex)}"
+            )
             raise ex

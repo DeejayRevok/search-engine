@@ -32,7 +32,7 @@ from webapp.container_config import container
 class IndexService:
     def __init__(self, logger: Logger, sql_storage_engine: Engine):
         self.__logger = logger
-        self.__logger.info('Starting indexing service')
+        self.__logger.info("Starting indexing service")
         self.__session_provider = SqlSessionProvider(sql_storage_engine)
         self.__source_repository = SourceRepository(self.__session_provider, self.__logger)
         self.__new_repository = NewRepository(self.__session_provider, self.__logger)
@@ -40,19 +40,21 @@ class IndexService:
         self.__named_entity_type_repository = NamedEntityTypeRepository(self.__session_provider, self.__logger)
         self.__noun_chunk_repository = NounChunkRepository(self.__session_provider, self.__logger)
 
-        self.__exchange_consumer = ExchangeConsumer(**config.rabbit,
-                                                    exchange='news',
-                                                    queue_name='news-indexing',
-                                                    message_callback=self.index_message,
-                                                    logger=self.__logger)
+        self.__exchange_consumer = ExchangeConsumer(
+            **config.rabbit,
+            exchange="news",
+            queue_name="news-indexing",
+            message_callback=self.index_message,
+            logger=self.__logger,
+        )
 
         if not self.__exchange_consumer.test_connection():
-            self.__logger.error('Error connecting to the queue provider. Exiting...')
+            self.__logger.error("Error connecting to the queue provider. Exiting...")
             sys.exit(1)
 
         self.__consume_process = None
-        if platform.system() != 'Windows':
-            self.__logger.info('Starting consumer process')
+        if platform.system() != "Windows":
+            self.__logger.info("Starting consumer process")
             self.__consume_process = Process(target=self.__exchange_consumer.__call__)
             self.__consume_process.start()
 
@@ -65,11 +67,9 @@ class IndexService:
     async def __index_new(self, new_title: str, new_url: str, new_sentiment: float, source: Source) -> NewModel:
         saved_new: NewModel = await self.__new_repository.get_one_filtered(title=new_title)
         if saved_new is None:
-            saved_new = await self.__new_repository.save(NewModel(
-                title=new_title,
-                url=new_url,
-                sentiment=new_sentiment,
-                source_id=source.id))
+            saved_new = await self.__new_repository.save(
+                NewModel(title=new_title, url=new_url, sentiment=new_sentiment, source_id=source.id)
+            )
         elif saved_new is not None and saved_new.sentiment != new_sentiment:
             saved_new.sentiment = new_sentiment
             saved_new = await self.__new_repository.save(saved_new)
@@ -78,22 +78,22 @@ class IndexService:
     async def __index_named_entities(self, named_entities: List[NamedEntity], entities_saved_new: NewModel):
         async def __index_named_entity_type(name: str, description: str = None) -> NamedEntityType:
             saved_named_entity_type: NamedEntityType = await self.__named_entity_type_repository.get_one_filtered(
-                name=name)
+                name=name
+            )
             if saved_named_entity_type is None:
                 saved_named_entity_type = await self.__named_entity_type_repository.save(
-                    NamedEntityType(name=name, description=description))
+                    NamedEntityType(name=name, description=description)
+                )
             return saved_named_entity_type
 
         async def __index_named_entity(
-                value: str,
-                named_entity_type: NamedEntityType,
-                new_model: NewModel
+            value: str, named_entity_type: NamedEntityType, new_model: NewModel
         ) -> NamedEntityModel:
             saved_named_entity: NamedEntityModel = await self.__named_entity_repository.get_one_filtered(value=value)
             if saved_named_entity is None:
-                saved_named_entity = await self.__named_entity_repository.save(NamedEntityModel(
-                    value=value,
-                    named_entity_type_id=named_entity_type.id))
+                saved_named_entity = await self.__named_entity_repository.save(
+                    NamedEntityModel(value=value, named_entity_type_id=named_entity_type.id)
+                )
             saved_named_entity.news.append(new_model)
             return saved_named_entity
 
@@ -102,7 +102,9 @@ class IndexService:
                 named_ent_type = await __index_named_entity_type(named_entity.type)
                 await __index_named_entity(named_entity.text, named_ent_type, entities_saved_new)
             except Exception as ex:
-                self.__logger.error('Error while indexing named entity %s: %s', named_entity.text, str(ex), exc_info=True)
+                self.__logger.error(
+                    "Error while indexing named entity %s: %s", named_entity.text, str(ex), exc_info=True
+                )
 
     async def __index_noun_chunks(self, noun_chunks: List[str], chunks_saved_new: NewModel):
         async def __index_noun_chunk(value: str, new_model: NewModel) -> NounChunk:
@@ -116,7 +118,7 @@ class IndexService:
             try:
                 await __index_noun_chunk(noun_chunk, chunks_saved_new)
             except Exception as ex:
-                self.__logger.error('Error while indexing noun chunk %s: %s', noun_chunk, str(ex), exc_info=True)
+                self.__logger.error("Error while indexing noun chunk %s: %s", noun_chunk, str(ex), exc_info=True)
 
     async def index_new(self, new: New) -> NewModel:
         with self.__session_provider(read_only=False):
@@ -135,22 +137,22 @@ class IndexService:
         return saved_new_model
 
     def index_message(self, _, __, ___, body: str):
-        apm = container.get('apm')
-        apm.begin_transaction('consume')
+        apm = container.get("apm")
+        apm.begin_transaction("consume")
         try:
             body = json.loads(body)
-            self.__logger.info('Indexing new %s', body['title'])
+            self.__logger.info("Indexing new %s", body["title"])
             new = from_dict(New, body)
             asyncio.run(self.index_new(new))
 
-            apm.end_transaction('New index', 'OK')
+            apm.end_transaction("New index", "OK")
         except Exception as ex:
-            self.__logger.error('Error while indexing new %s', str(ex), exc_info=True)
-            apm.end_transaction('New index', 'FAIL')
+            self.__logger.error("Error while indexing new %s", str(ex), exc_info=True)
+            apm.end_transaction("New index", "FAIL")
             apm.capture_exception()
 
     async def shutdown(self):
-        self.__logger.info('Shutting down indexing service')
+        self.__logger.info("Shutting down indexing service")
         self.__exchange_consumer.shutdown()
         if self.__consume_process:
             self.__consume_process.join()
