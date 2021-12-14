@@ -10,13 +10,15 @@ from webapp.graph.queries.sources import SourceQueries
 from webapp.graph.queries.user import UserQueries
 
 
-class Query(NewQueries,
-            SourceQueries,
-            NamedEntityQueries,
-            NamedEntityTypeQueries,
-            NounChunkQueries,
-            NewspaperQueries,
-            UserQueries):
+class Query(
+    NewQueries,
+    SourceQueries,
+    NamedEntityQueries,
+    NamedEntityTypeQueries,
+    NounChunkQueries,
+    NewspaperQueries,
+    UserQueries,
+):
     """
     The main GraphQL query point.
     """
