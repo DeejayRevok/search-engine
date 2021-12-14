@@ -21,5 +21,5 @@ __all__ = [
     "NewsSearch",
     "Newspaper",
     "NewspaperFilter",
-    "User"
+    "User",
 ]
