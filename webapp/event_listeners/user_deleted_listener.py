@@ -11,7 +11,7 @@ class UserDeletedListener(EventListener):
         self.__logger = logger
 
     async def listener_handler(self, _, uaa_id: int = None):
-        self.__logger.info(f"Received user deletion event")
+        self.__logger.info("Received user deletion event")
         try:
             user = await self.__user_repository.get_one_filtered(id=uaa_id)
             await self.__user_repository.delete(user)

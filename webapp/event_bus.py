@@ -67,5 +67,5 @@ def run_event_bus(
         p = Process(target=event_bus_runner, args=(bus,))
         p.start()
     else:
-        logger.error(f"Redis service not available. Exiting...")
+        logger.error("Redis service not available. Exiting...")
         sys.exit(1)

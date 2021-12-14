@@ -92,7 +92,7 @@ class FollowNewspaper(Mutation):
 
                     return FollowNewspaper(ok=True)
                 else:
-                    raise ValueError(f"Impossible to follow your own newspaper")
+                    raise ValueError("Impossible to follow your own newspaper")
             else:
                 raise ValueError(f"Newspaper {newspaper_name} not found")
 

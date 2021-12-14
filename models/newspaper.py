@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Table, ForeignKey
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship
 
 from models.base import BASE
 from models.user import User, newspaper_follows
