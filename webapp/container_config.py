@@ -105,6 +105,8 @@ def load():
                 Argument("protocol", "#news_manager.protocol"),
                 Argument("host", "#news_manager.host"),
                 Argument("port", "#news_manager.port"),
+                Argument("jwt_secret", "#server.jwt_secret"),
+                Argument("logger", "@logger"),
             ],
         )
     )
