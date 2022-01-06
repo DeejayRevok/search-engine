@@ -2,6 +2,7 @@ server:
   host: 0.0.0.0
   port: 8083
   base_path:
+  jwt_secret: t0k3ns3cr3t
 storage:
   host: mysql-search-engine
   port: 3306
