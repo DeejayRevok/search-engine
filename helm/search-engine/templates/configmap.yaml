@@ -4,7 +4,7 @@ metadata:
   name: search-engine-configmap
 data:
   JWT_SECRET: '{{ .Values.JWT_SECRET }}'
-  SERVER_BASEPATH: '{{ .Values.SERVER_BASEPATH }}'
+  SERVER__BASE_PATH: '{{ .Values.SERVER_BASEPATH }}'
 
   MYSQL_DATABASE: '{{ .Values.MYSQL_DATABASE }}'
   MYSQL_PASSWORD: '{{ .Values.MYSQL_PASSWORD }}'
@@ -13,6 +13,7 @@ data:
 
   SEARCH_ENGINE_SERVER__HOST: '{{ .Values.global.SEARCH_ENGINE_SERVER__HOST }}'
   SEARCH_ENGINE_SERVER__PORT: '{{ .Values.global.SEARCH_ENGINE_SERVER__PORT }}'
+  SEARCH_ENGINE_SERVER__BASE_PATH: '{{ .Values.global.SEARCH_ENGINE_SERVER__BASE_PATH }}'
 
   SEARCH_ENGINE_STORAGE__HOST: '{{ .Values.global.SEARCH_ENGINE_STORAGE__HOST }}'
   SEARCH_ENGINE_STORAGE__PORT: '{{ .Values.global.SEARCH_ENGINE_STORAGE__PORT }}'
