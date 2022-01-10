@@ -55,4 +55,4 @@ class NewsManagerService:
             self.__gql_client = Client(transport=transport, fetch_schema_from_transport=True)
 
     def __generate_auth_token(self) -> str:
-        return encode(dict(user_id=-1000), key=self.__jwt_secret, algorithm=self.__JWT_AUTH_ALGORITHM)
+        return encode(dict(user_id=-1000), key=self.__jwt_secret, algorithm=self.__JWT_AUTH_ALGORITHM).decode("utf-8")
