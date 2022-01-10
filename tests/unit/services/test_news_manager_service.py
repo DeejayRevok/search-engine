@@ -38,7 +38,7 @@ class TestNewsManagerService(TestCase):
     @patch("services.news_manager_service.Client")
     @async_test
     async def test_get_new_title(self, mock_gql_client, encode_mock, _):
-        encode_mock.return_value = "test_token_encoded"
+        encode_mock.return_value = b"test_token_encoded"
         news_manager_service = NewsManagerService("test", "test", "test", "test", getLogger())
 
         test_title = "Test title"
