@@ -27,6 +27,7 @@ class NewsManagerService:
                 summary
                 sentiment
                 nounChunks
+                image
             }
         }
     """
