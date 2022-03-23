@@ -28,6 +28,7 @@ class TestNewsManagerService(TestCase):
                 summary
                 sentiment
                 nounChunks
+                image
             }
         }
     """
