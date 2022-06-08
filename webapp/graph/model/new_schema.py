@@ -1,10 +1,15 @@
-from graphene import Node, Field, Boolean
+from typing import List, Tuple
+
+from graphene import Node, Field, Boolean, List as GraphList, String
 from graphene_sqlalchemy import SQLAlchemyObjectType
 from graphene_sqlalchemy_filter import FilterSet
 from graphql import ResolveInfo
+from sqlalchemy.orm import Query
+from sqlalchemy.sql.elements import BinaryExpression
 from news_service_lib.graph.model.new import New as NewDetail
 
 from log_config import get_logger
+from models.named_entity import NamedEntity as NamedEntityModel
 from models.new import New as NewModel
 from services.news_manager_service import NewsManagerService
 from webapp.container_config import container
@@ -40,3 +45,15 @@ class NewFilter(FilterSet):
             "title": [...],
             "sentiment": [...],
         }
+
+    has_any_entity = GraphList(String)
+
+    @classmethod
+    def has_any_entity_filter(
+        cls, _: ResolveInfo, query: Query, named_entity_values: List[str]
+    ) -> Tuple[Query, BinaryExpression]:
+        query = query.join(NamedEntityModel, NewModel.named_entities)
+
+        filter_ = NamedEntityModel.value.in_(named_entity_values)
+
+        return query, filter_
