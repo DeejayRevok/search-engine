@@ -50,10 +50,7 @@ class NewFilter(FilterSet):
 
     @classmethod
     def has_any_entity_filter(
-            cls,
-            _: ResolveInfo,
-            query: Query,
-            named_entity_values: List[str]
+        cls, _: ResolveInfo, query: Query, named_entity_values: List[str]
     ) -> Tuple[Query, BinaryExpression]:
         query = query.join(NamedEntityModel, NewModel.named_entities)
 
