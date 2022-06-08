@@ -1,7 +1,9 @@
-from graphene import Node, Field, Boolean
+from graphene import Node, Field, Boolean, List as GraphList, String
 from graphene_sqlalchemy import SQLAlchemyObjectType
 from graphene_sqlalchemy_filter import FilterSet
 from graphql import ResolveInfo
+
+from models.named_entity import NamedEntity as NamedEntityModel
 from news_service_lib.graph.model.new import New as NewDetail
 
 from log_config import get_logger
@@ -40,3 +42,13 @@ class NewFilter(FilterSet):
             "title": [...],
             "sentiment": [...],
         }
+
+    has_any_entity = GraphList(String)
+
+    @classmethod
+    def has_any_entity_filter(cls, _, query, named_entity_values):
+        query = query.join(NamedEntityModel, NewModel.named_entities)
+
+        filter_ = NamedEntityModel.value.in_(named_entity_values)
+
+        return query, filter_
