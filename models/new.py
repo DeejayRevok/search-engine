@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, Text
 from sqlalchemy.orm import relationship, backref
 
 from models.source import Source
@@ -15,6 +15,8 @@ class New(BASE):
     title = Column(String(255), unique=True)
     url = Column(String(2083), nullable=False)
     sentiment = Column(Float)
+    summary = Column(Text, nullable=True, default=None, server_default=None)
+
     source_id = Column(ForeignKey("source.id"), nullable=False, index=True)
 
     source: Source = relationship("Source", lazy="select", uselist=False, backref=backref("news", lazy="select"))
