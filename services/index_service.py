@@ -64,14 +64,19 @@ class IndexService:
             saved_source = await self.__source_repository.save(Source(name=source_name))
         return saved_source
 
-    async def __index_new(self, new_title: str, new_url: str, new_sentiment: float, source: Source) -> NewModel:
+    async def __index_new(
+        self, new_title: str, new_url: str, new_sentiment: float, source: Source, new_summary: str
+    ) -> NewModel:
         saved_new: NewModel = await self.__new_repository.get_one_filtered(title=new_title)
         if saved_new is None:
             saved_new = await self.__new_repository.save(
-                NewModel(title=new_title, url=new_url, sentiment=new_sentiment, source_id=source.id)
+                NewModel(
+                    title=new_title, url=new_url, sentiment=new_sentiment, source_id=source.id, summary=new_summary
+                )
             )
-        elif saved_new is not None and saved_new.sentiment != new_sentiment:
+        elif saved_new is not None and (saved_new.sentiment != new_sentiment or saved_new.summary != new_summary):
             saved_new.sentiment = new_sentiment
+            saved_new.summary = new_summary
             saved_new = await self.__new_repository.save(saved_new)
         return saved_new
 
@@ -126,7 +131,9 @@ class IndexService:
                 saved_source_model = await self.__index_source(new.source)
 
             if new.title is not None:
-                saved_new_model = await self.__index_new(new.title, new.url, new.sentiment, saved_source_model)
+                saved_new_model = await self.__index_new(
+                    new.title, new.url, new.sentiment, saved_source_model, new.summary
+                )
 
             if new.entities is not None:
                 await self.__index_named_entities(new.entities, saved_new_model)
