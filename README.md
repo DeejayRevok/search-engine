@@ -11,8 +11,6 @@ Run the parent's repo dev docker compose.
 
 Inside the application folder run:
 ```
-export JWT_SECRET={JWT_TOKEN_SECRET}
-export PYTHONPATH={FULL_PATH_TO_APPLICATION_FOLDER}
-pip install -r requirements-prod.txt
-python webapp/main.py -c ./configs/config_local.yml
+cp .env.example .env
+docker-compose up -d
 ```
