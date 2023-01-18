@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  name: search-engine-new-saved-consumer
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    spec:
+      containers:
+      - envFrom:
+          - configMapRef:
+              name: search-engine-configmap
+        image: 'djrevok/search-engine:{{ .Chart.AppVersion }}'
+        name: search-engine-new-saved-consumer
+        resources: {}
+        command:
+          - make
+          - run_kombu_event_consumer
+          - EVENT_NAME=event.new_saved
+          - CONSUMER_NAME=event_consumer.search_engine.index_new.new_saved
+      restartPolicy: Always
+      serviceAccountName: ""
+status: {}

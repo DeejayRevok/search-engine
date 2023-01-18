@@ -1,0 +1,31 @@
+name: search-engine-umbrella
+description: Search engine umbrella helm chart
+version: 0.0.0
+appVersion: latest
+apiVersion: v1
+keywords:
+  - search-engine
+sources:
+home:
+dependencies:
+  - name: search-engine
+    version: 0.0.0
+    repository: "file://../search-engine"
+  - name: redis
+    version: 17.4.3
+    repository: "https://charts.bitnami.com/bitnami"
+  - name: rabbitmq
+    version: 11.4.0
+    repository: "https://charts.bitnami.com/bitnami"
+  - name: logstash
+    version: 7.6.0
+    repository: "https://helm.elastic.co"
+  - name: apm-server
+    version: 7.6.0
+    repository: "https://helm.elastic.co"
+  - name: elasticsearch
+    version: 7.6.0
+    repository: "https://helm.elastic.co"
+  - name: kibana
+    version: 7.6.0
+    repository: "https://helm.elastic.co"

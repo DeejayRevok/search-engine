@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: search-engine-user-created-consumer
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    spec:
+      containers:
+      - envFrom:
+          - configMapRef:
+              name: search-engine-configmap
+        image: 'djrevok/search-engine:{{ .Chart.AppVersion }}'
+        name: search-engine-user-created-consumer
+        resources: {}
+        command:
+          - make
+          - run_kombu_event_consumer
+          - EVENT_NAME=event.user_created
+          - CONSUMER_NAME=event_consumer.search_engine.save_user.user_created
+      restartPolicy: Always
+      serviceAccountName: ""
+status: {}
