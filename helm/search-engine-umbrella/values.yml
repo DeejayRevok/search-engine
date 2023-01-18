@@ -1,0 +1,32 @@
+rabbitmq:
+  auth:
+    username: test_username
+    password: test_password
+
+redis:
+  auth:
+    password: test_password
+
+logstash:
+  logstashPipeline:
+    logstash.conf: |
+      input { beats { port => 5044 } }
+      filter { json { source => "message" } }
+      output {
+        elasticsearch {
+          hosts => ["http://elasticsearch-master:9200"]
+          index => "%{[@metadata][beat]}-%{[@metadata][version]}"
+        }
+      }
+
+apm-server:
+  apmConfig:
+    apm-server.yml: |
+      apm-server:
+        host: "0.0.0.0:8200"
+        secret-token: "xxVpmQB2HMzCL9PgBHVrnxjNXXw5J7bd79DFm6sjBJR5HPXDhcF8MSb3vv4bpg44"
+      output.elasticsearch:
+        hosts: ["http://elasticsearch-master:9200"]
+      setup:
+        kibana.host: "kibana:5601"
+        template.enabled: "true"

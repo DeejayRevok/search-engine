@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: search-engine-postgres
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    spec:
+      containers:
+        envFrom:
+          - configMapRef:
+              name: search-engine-configmap
+        image: postgres:15.0
+        imagePullPolicy: ""
+        name: search-engine-postgres
+        ports:
+        - containerPort: 5434
+        resources: {}
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: search-engine-postgres-data
+      restartPolicy: Always
+      serviceAccountName: ""
+      volumes:
+      - name: search-engine-postgres-data
+        persistentVolumeClaim:
+          claimName: search-engine-postgres-data
+status: {}

@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: search-engine-web-server
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    spec:
+      containers:
+      - envFrom:
+          - configMapRef:
+              name: search-engine-configmap
+        image: 'djrevok/search-engine:{{ .Chart.AppVersion }}'
+        name: search-engine-web-server
+        ports:
+        - containerPort: 8081
+        resources: {}
+        command:
+          - make
+          - run_web_server
+      restartPolicy: Always
+      serviceAccountName: ""
+status: {}
