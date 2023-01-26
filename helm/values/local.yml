@@ -1,4 +1,4 @@
-global:
+search-engine:
   SEARCH_ENGINE_SERVER__HOST: 0.0.0.0
   SEARCH_ENGINE_SERVER__PORT: 8081
   SEARCH_ENGINE_SERVER__BASE_PATH: /search
@@ -11,9 +11,9 @@ global:
 
   SEARCH_ENGINE_ELASTIC_APM__SERVICE_NAME: search-engine
   SEARCH_ENGINE_ELASTIC_APM__SECRET_TOKEN: xxVpmQB2HMzCL9PgBHVrnxjNXXw5J7bd79DFm6sjBJR5HPXDhcF8MSb3vv4bpg44
-  SEARCH_ENGINE_ELASTIC_APM__URL: http://apm-server:8200
+  SEARCH_ENGINE_ELASTIC_APM__URL: http://monitor-apm-server:8200
 
-  SEARCH_ENGINE_REDIS__HOST: redis
+  SEARCH_ENGINE_REDIS__HOST: redis-master
   SEARCH_ENGINE_REDIS__PORT: 6379
   SEARCH_ENGINE_REDIS__PASSWORD: test_password
 
@@ -23,4 +23,59 @@ global:
   SEARCH_ENGINE_RABBIT__USER: test_user
 
   SEARCH_ENGINE_IAM_JWKS_PATH: http://iam:8888/jwks
-  SEARCH_ENGINE_ELASTICSEARCH_HOSTS: elasticsearch-master:9200
+
+  SEARCH_ENGINE_ELASTICSEARCH_HOSTS: monitor-elasticsearch:9200
+  SEARCH_ENGINE_LOGSTASH_HOSTS: monitor-logstash:5044
+  SEARCH_ENGINE_KIBANA_HOST: monitor-kibana:5601
+
+  POSTGRES_DB: search-engine
+  POSTGRES_USER: app-user
+  POSTGRES_PASSWORD: app-user-password
+
+rabbitmq:
+  fullnameOverride: rabbitmq
+  auth:
+    username: test_user
+    password: test_password
+
+redis:
+  fullnameOverride: redis
+  auth:
+    password: test_password
+
+monitor:
+  APM_SERVER_HOST: 0.0.0.0:8200
+  APM_SERVER_SECRET_TOKEN: xxVpmQB2HMzCL9PgBHVrnxjNXXw5J7bd79DFm6sjBJR5HPXDhcF8MSb3vv4bpg44
+  APM_SERVER_LOGGING_TO_FILES: false
+  APM_SERVER_SETUP_KIBANA_HOST: monitor-kibana:5601
+  APM_SERVER_SETUP_TEMPLATE_ENABLED: true
+  APM_SERVER_ELASTICSEARCH_HOSTS: http://monitor-elasticsearch:9200
+
+  ELASTICSEARCH_ES_JAVA_OPTS: -Xms512m -Xmx512m
+  ELASTICSEARCH_JAVA_TOOL_OPTIONS: -Xms512m -Xmx512m
+  ELASTICSEARCH_DISCOVERY_TYPE: single-node
+
+  KIBANA_SERVER_BASEPATH: /monitor/kibana
+  KIBANA_ELASTICSEARCH_HOSTS: http://monitor-elasticsearch:9200
+
+  LOGSTASH_PIPELINE_WORKERS: 2
+  LOGSTASH_XPACK_MONITORING_ELASTICSEARCH_HOSTS: http://monitor-elasticsearch:9200
+  LOGSTASH_CONFIG_STRING: |
+    input {
+      beats {
+        port => 5044
+      }
+    }
+
+    filter {
+      json {
+        source => "message"
+      }
+    }
+
+    output {
+      elasticsearch {
+        hosts => ["http://monitor-elasticsearch:9200"]
+        index => "%{[@metadata][beat]}-%{[@metadata][version]}"
+      }
+    }

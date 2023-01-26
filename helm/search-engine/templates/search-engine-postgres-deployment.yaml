@@ -1,15 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  labels:
+    app.kubernetes.io/name: search-engine-postgres
   name: search-engine-postgres
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: search-engine-postgres
   strategy:
     type: Recreate
   template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: search-engine-postgres
     spec:
       containers:
-        envFrom:
+      - envFrom:
           - configMapRef:
               name: search-engine-configmap
         image: postgres:15.0
