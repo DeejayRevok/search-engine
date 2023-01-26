@@ -17,15 +17,6 @@ dependencies:
   - name: rabbitmq
     version: 11.4.0
     repository: "https://charts.bitnami.com/bitnami"
-  - name: logstash
-    version: 7.6.0
-    repository: "https://helm.elastic.co"
-  - name: apm-server
-    version: 7.6.0
-    repository: "https://helm.elastic.co"
-  - name: elasticsearch
-    version: 7.6.0
-    repository: "https://helm.elastic.co"
-  - name: kibana
-    version: 7.6.0
-    repository: "https://helm.elastic.co"
+  - name: monitor
+    version: 1.0.2
+    repository: "https://deejayrevok.github.io/helm-repo"
