@@ -26,9 +26,9 @@ search-engine:
   SEARCH_ENGINE_LOGSTASH_HOSTS: monitor-logstash:5044
   SEARCH_ENGINE_KIBANA_HOST: monitor-kibana:5601
 
-  POSTGRES_DB: search-engine
-  POSTGRES_USER: app-user
-  POSTGRES_PASSWORD: app-user-password
+  SEARCH_ENGINE_POSTGRES_DB: search-engine
+  SEARCH_ENGINE_POSTGRES_USER: app-user
+  SEARCH_ENGINE_POSTGRES_PASSWORD: app-user-password
 
 rabbitmq:
   fullnameOverride: rabbitmq
