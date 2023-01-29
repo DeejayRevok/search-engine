@@ -1,6 +1,6 @@
 name: search-engine-umbrella
 description: Search engine umbrella helm chart
-version: 0.0.0
+version: latest
 appVersion: latest
 apiVersion: v1
 keywords:
