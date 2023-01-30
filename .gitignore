@@ -2,11 +2,8 @@
 .idea
 *.tgz
 *.lock
-<<<<<<< Updated upstream
 *.out
-=======
 *.DS_Store
->>>>>>> Stashed changes
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
