@@ -20,7 +20,7 @@ search-engine:
   SEARCH_ENGINE_RABBIT__PASSWORD: test_password
   SEARCH_ENGINE_RABBIT__USER: test_user
 
-  SEARCH_ENGINE_IAM_JWKS_PATH: http://iam:8888/jwks
+  SEARCH_ENGINE_IAM_JWKS_PATH: http://iam-web-server:8888/jwks
 
   SEARCH_ENGINE_ELASTICSEARCH_HOSTS: monitor-elasticsearch:9200
   SEARCH_ENGINE_LOGSTASH_HOSTS: monitor-logstash:5044
