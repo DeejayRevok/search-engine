@@ -36,7 +36,7 @@ spec:
         resources: {}
         command:
           - make
-          - run_kombu_event_consumer
+          - run_kombu_iam_event_consumer
           - EVENT_NAME=event.user_created
           - CONSUMER_NAME=event_consumer.search_engine.save_user.user_created
       restartPolicy: Always
