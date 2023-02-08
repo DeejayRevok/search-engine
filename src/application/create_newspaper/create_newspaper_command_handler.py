@@ -16,11 +16,11 @@ from domain.newspaper.newspaper_repository import NewspaperRepository
 
 class CreateNewspaperCommandHandler(CommandHandler):
     def __init__(
-            self,
-            newspaper_repository: NewspaperRepository,
-            named_entity_repository: NamedEntityRepository,
-            event_bus: EventBus,
-            logger: Logger
+        self,
+        newspaper_repository: NewspaperRepository,
+        named_entity_repository: NamedEntityRepository,
+        event_bus: EventBus,
+        logger: Logger,
     ):
         self.__newspaper_repository = newspaper_repository
         self.__named_entity_repository = named_entity_repository
@@ -43,13 +43,11 @@ class CreateNewspaperCommandHandler(CommandHandler):
             id=uuid4(),
             name=command.name,
             user_email=command.user_email,
-            named_entities=list(self.__get_named_entities(command.named_entities_values))
+            named_entities=list(self.__get_named_entities(command.named_entities_values)),
         )
 
     def __get_named_entities(self, named_entities_values: List[str]) -> Iterable[NamedEntity]:
-        criteria = FindNamedEntitiesCriteria(
-            value_in=named_entities_values
-        )
+        criteria = FindNamedEntitiesCriteria(value_in=named_entities_values)
         return self.__named_entity_repository.find_by_criteria(criteria)
 
     def __create_event_from_newspaper(self, newspaper: Newspaper) -> NewspaperCreatedEvent:

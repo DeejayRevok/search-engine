@@ -15,7 +15,7 @@ class NewSavedEventConsumer(EventConsumer):
             url=event.url,
             sentiment=event.sentiment,
             source_name=event.source,
-            named_entities=event.entities
+            named_entities=event.entities,
         )
         self.__command_bus.transport(index_new_command)
 

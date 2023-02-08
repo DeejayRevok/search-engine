@@ -10,11 +10,7 @@ class UserCreatedEventConsumer(EventConsumer):
         self.__command_bus = command_bus
 
     def consume(self, event: UserCreatedEvent) -> None:
-        self.__command_bus.transport(
-            SaveUserCommand(
-                email=event.email
-            )
-        )
+        self.__command_bus.transport(SaveUserCommand(email=event.email))
 
     @classmethod
     def bus_stop_name(cls) -> str:

@@ -18,7 +18,7 @@ class NewQueries(ObjectType):
         title=String(required=False),
         source=String(required=False),
         sort_criteria=Argument(Enum.from_enum(SortNewsCriteria)),
-        description="Find news filtered"
+        description="Find news filtered",
     )
     news_by_named_entities_union = Field(
         List(New),
@@ -33,33 +33,25 @@ class NewQueries(ObjectType):
         query_bus: QueryBus = container_builder.get(
             "bus_station.query_terminal.bus.synchronous.sync_query_bus.SyncQueryBus"
         )
-        query = GetNewsQuery(
-            any_named_entity=named_entities
-        )
-        return [
-            asdict(new) for new in query_bus.transport(query).data
-        ]
+        query = GetNewsQuery(any_named_entity=named_entities)
+        return [asdict(new) for new in query_bus.transport(query).data]
 
     @staticmethod
     @login_required
     async def resolve_news(
-            _,
-            __,
-            title: Optional[str] = None,
-            source: Optional[str] = None,
-            sort_criteria: Optional[SortNewsCriteria] = None
+        _,
+        __,
+        title: Optional[str] = None,
+        source: Optional[str] = None,
+        sort_criteria: Optional[SortNewsCriteria] = None,
     ) -> TypingList[dict]:
         query_bus: QueryBus = container_builder.get(
             "bus_station.query_terminal.bus.synchronous.sync_query_bus.SyncQueryBus"
         )
         query = GetNewsQuery(
-            title=title,
-            source=source,
-            sorting=sort_criteria.value if sort_criteria is not None else None
+            title=title, source=source, sorting=sort_criteria.value if sort_criteria is not None else None
         )
-        return [
-            asdict(new) for new in query_bus.transport(query).data
-        ]
+        return [asdict(new) for new in query_bus.transport(query).data]
 
     @staticmethod
     @login_required
@@ -67,8 +59,6 @@ class NewQueries(ObjectType):
         query_bus: QueryBus = container_builder.get(
             "bus_station.query_terminal.bus.synchronous.sync_query_bus.SyncQueryBus"
         )
-        query = GetNewQuery(
-            id=str(id)
-        )
+        query = GetNewQuery(id=str(id))
         new = query_bus.transport(query).data
         return asdict(new) if new is not None else None

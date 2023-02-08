@@ -33,7 +33,7 @@ class SQLAlchemyNewMapper(SQLAlchemyMapper):
     def mapping_properties(self) -> dict:
         return {
             "named_entities": relationship(
-                    NamedEntity, secondary=self.__named_entities_association_table, cascade="all"
-                ),
-            "source": relationship(Source)
+                NamedEntity, secondary=self.__named_entities_association_table, cascade="all"
+            ),
+            "source": relationship(Source),
         }

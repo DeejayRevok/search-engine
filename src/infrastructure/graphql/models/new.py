@@ -22,13 +22,11 @@ class New(ObjectType):
         query_bus: QueryBus = container_builder.get(
             "bus_station.query_terminal.bus.synchronous.distributed.rpyc_query_bus.RPyCQueryBus"
         )
-        query = GetNewQuery(
-            title=root["title"]
-        )
+        query = GetNewQuery(title=root["title"])
         query_response = query_bus.transport(query)
         return {
             "content": query_response.data["content"],
             "date": query_response.data["date"],
             "hydrated": query_response.data["hydrated"],
-            "summary": query_response.data["summary"]
+            "summary": query_response.data["summary"],
         }

@@ -28,7 +28,7 @@ class SQLAlchemyNewRepository(NewRepository):
         return self.__sqlalchemy_session.query(New).filter_by(title=new_title).one_or_none()
 
     def find_by_criteria(
-            self, criteria: FindNewsCriteria, sort_criteria: Optional[SortNewsCriteria] = None
+        self, criteria: FindNewsCriteria, sort_criteria: Optional[SortNewsCriteria] = None
     ) -> List[New]:
         query = self.__sqlalchemy_session.query(New)
         query = self.__apply_find_criteria(query, criteria)
@@ -46,10 +46,9 @@ class SQLAlchemyNewRepository(NewRepository):
             query = query.join(New.named_entities).filter(NamedEntity.value.in_(find_criteria.any_named_entity_value))
 
         if find_criteria.all_named_entities_values is not None:
-            query = query.join(New.named_entities).filter(All(
-                NamedEntity.value,
-                find_criteria.all_named_entities_values
-            ))
+            query = query.join(New.named_entities).filter(
+                All(NamedEntity.value, find_criteria.all_named_entities_values)
+            )
 
         if find_criteria.source_name is not None:
             query = query.join(New.source).filter(Source.name == find_criteria.source_name)

@@ -8,11 +8,7 @@ from domain.newspaper.newspaper_repository import NewspaperRepository
 
 
 class DeleteNewspaperCommandHandler(CommandHandler):
-    def __init__(
-        self,
-        newspaper_repository: NewspaperRepository,
-        logger: Logger
-    ):
+    def __init__(self, newspaper_repository: NewspaperRepository, logger: Logger):
         self.__newspaper_repository = newspaper_repository
         self.__logger = logger
 

@@ -14,15 +14,12 @@ class TestGetNamedEntitiesQueryHandler(TestCase):
     def setUp(self) -> None:
         self.named_entity_repository_mock = Mock(spec=NamedEntityRepository)
         self.logger_mock = Mock(spec=Logger)
-        self.query_handler = GetNamedEntitiesQueryHandler(
-            self.named_entity_repository_mock,
-            self.logger_mock
-        )
+        self.query_handler = GetNamedEntitiesQueryHandler(self.named_entity_repository_mock, self.logger_mock)
 
     def test_handle_success(self):
         test_named_entity = NamedEntity(
             value="test_named_entity",
-            named_entity_type=NamedEntityType(name="test_named_entity_type", description="Test")
+            named_entity_type=NamedEntityType(name="test_named_entity_type", description="Test"),
         )
         test_named_entities = [test_named_entity, test_named_entity]
         self.named_entity_repository_mock.find_by_criteria.return_value = test_named_entities

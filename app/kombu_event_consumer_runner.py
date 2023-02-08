@@ -15,17 +15,21 @@ def run() -> None:
     engine = KombuEventBusEngine(
         container_builder.get("kombu.connection.Connection"),
         container_builder.get("bus_station.event_terminal.registry.redis_event_registry.RedisEventRegistry"),
-        container_builder.get("bus_station.event_terminal.middleware.event_middleware_receiver.EventMiddlewareReceiver"),
+        container_builder.get(
+            "bus_station.event_terminal.middleware.event_middleware_receiver.EventMiddlewareReceiver"
+        ),
         __get_passenger_deserializer(args["deserializer"]),
         args["event"],
-        args["consumer"]
+        args["consumer"],
     )
     SelfProcessEngineRunner(engine).run()
 
 
 def __get_passenger_deserializer(deserializer_fqn: Optional[str]) -> PassengerDeserializer:
     if deserializer_fqn is None:
-        return container_builder.get("bus_station.passengers.serialization.passenger_json_deserializer.PassengerJSONDeserializer")
+        return container_builder.get(
+            "bus_station.passengers.serialization.passenger_json_deserializer.PassengerJSONDeserializer"
+        )
     return container_builder.get(deserializer_fqn)
 
 

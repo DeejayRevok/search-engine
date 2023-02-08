@@ -15,10 +15,7 @@ class TestGetNewQueryHandler(TestCase):
     def setUp(self) -> None:
         self.new_repository_mock = Mock(spec=NewRepository)
         self.logger_mock = Mock(spec=Logger)
-        self.query_handler = GetNewQueryHandler(
-            self.new_repository_mock,
-            self.logger_mock
-        )
+        self.query_handler = GetNewQueryHandler(self.new_repository_mock, self.logger_mock)
 
     def test_handle_success(self):
         test_uuid = uuid4()
@@ -28,7 +25,7 @@ class TestGetNewQueryHandler(TestCase):
             url="test_url",
             sentiment=Decimal("10.0"),
             source=Source(name="test_source"),
-            named_entities=[]
+            named_entities=[],
         )
         self.new_repository_mock.find_by_id.return_value = test_new
         test_query = GetNewQuery(id=str(test_uuid))

@@ -21,8 +21,6 @@ class DeleteNewspaperMutation(Mutation):
             "bus_station.command_terminal.bus.synchronous.sync_command_bus.SyncCommandBus"
         )
 
-        command_bus.transport(DeleteNewspaperCommand(
-            newspaper_id=str(id)
-        ))
+        command_bus.transport(DeleteNewspaperCommand(newspaper_id=str(id)))
 
         return DeleteNewspaperMutation(success=True)

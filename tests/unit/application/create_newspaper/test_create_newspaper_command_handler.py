@@ -23,10 +23,7 @@ class TestCreateNewspaperCommandHandler(TestCase):
         self.event_bus_mock = Mock(spec=EventBus)
         self.logger_mock = Mock(spec=Logger)
         self.command_handler = CreateNewspaperCommandHandler(
-            self.newspaper_repository_mock,
-            self.named_entity_repository_mock,
-            self.event_bus_mock,
-            self.logger_mock
+            self.newspaper_repository_mock, self.named_entity_repository_mock, self.event_bus_mock, self.logger_mock
         )
 
     @patch("application.create_newspaper.create_newspaper_command_handler.uuid4")
@@ -36,25 +33,27 @@ class TestCreateNewspaperCommandHandler(TestCase):
         test_command = CreateNewspaperCommand(
             name="test_newspaper",
             user_email="test_user",
-            named_entities_values=["test_named_entity_1", "test_named_entity_2"]
+            named_entities_values=["test_named_entity_1", "test_named_entity_2"],
         )
         test_named_entity = NamedEntity(
             value="test_named_entity",
-            named_entity_type=NamedEntityType(name="test_named_entity_type", description="Test named entity description")
+            named_entity_type=NamedEntityType(
+                name="test_named_entity_type", description="Test named entity description"
+            ),
         )
         self.named_entity_repository_mock.find_by_criteria.return_value = [test_named_entity, test_named_entity]
 
         self.command_handler.handle(test_command)
 
-        self.named_entity_repository_mock.find_by_criteria.assert_called_once_with(FindNamedEntitiesCriteria(
-            value_in=["test_named_entity_1", "test_named_entity_2"]
-        ))
+        self.named_entity_repository_mock.find_by_criteria.assert_called_once_with(
+            FindNamedEntitiesCriteria(value_in=["test_named_entity_1", "test_named_entity_2"])
+        )
         self.newspaper_repository_mock.save.assert_called_once_with(
             Newspaper(
                 id=test_uuid,
                 name="test_newspaper",
                 user_email="test_user",
-                named_entities=[test_named_entity, test_named_entity]
+                named_entities=[test_named_entity, test_named_entity],
             )
         )
         expected_event = NewspaperCreatedEvent(

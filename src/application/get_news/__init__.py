@@ -9,8 +9,10 @@ def load() -> None:
             "application.get_news.get_news_query_handler.GetNewsQueryHandler",
             "application.get_news.get_news_query_handler.GetNewsQueryHandler",
             [
-                Argument.no_kw_argument("@infrastructure.database.repositories.sqlalchemy_new_repository.SQLAlchemyNewRepository"),
-                Argument.no_kw_argument("@logging.Logger")
-            ]
+                Argument.no_kw_argument(
+                    "@infrastructure.database.repositories.sqlalchemy_new_repository.SQLAlchemyNewRepository"
+                ),
+                Argument.no_kw_argument("@logging.Logger"),
+            ],
         )
     )

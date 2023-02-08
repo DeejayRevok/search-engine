@@ -19,9 +19,5 @@ class NewspaperQueries(ObjectType):
         query_bus: QueryBus = container_builder.get(
             "bus_station.query_terminal.bus.synchronous.sync_query_bus.SyncQueryBus"
         )
-        query = GetNewspapersQuery(
-            user_email=user_email
-        )
-        return [
-            asdict(newspaper) for newspaper in query_bus.transport(query).data
-        ]
+        query = GetNewspapersQuery(user_email=user_email)
+        return [asdict(newspaper) for newspaper in query_bus.transport(query).data]

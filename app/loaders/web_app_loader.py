@@ -20,10 +20,20 @@ def load(*_) -> Application:
     graphql_scheme = container_builder.get("graphene.Schema")
     setup_graphql_routes(app, graphql_scheme)
 
-    app.middlewares.append(container_builder.get("infrastructure.aiohttp.middlewares.error_middleware.ErrorMiddleware").middleware)
-    app.middlewares.append(container_builder.get("infrastructure.aiohttp.middlewares.apm_middleware.APMMiddleware").middleware)
-    app.middlewares.append(container_builder.get("infrastructure.aiohttp.middlewares.log_middleware.LogMiddleware").middleware)
-    app.middlewares.append(container_builder.get("infrastructure.aiohttp.middlewares.authentication_middleware.AuthenticationMiddleware").middleware)
+    app.middlewares.append(
+        container_builder.get("infrastructure.aiohttp.middlewares.error_middleware.ErrorMiddleware").middleware
+    )
+    app.middlewares.append(
+        container_builder.get("infrastructure.aiohttp.middlewares.apm_middleware.APMMiddleware").middleware
+    )
+    app.middlewares.append(
+        container_builder.get("infrastructure.aiohttp.middlewares.log_middleware.LogMiddleware").middleware
+    )
+    app.middlewares.append(
+        container_builder.get(
+            "infrastructure.aiohttp.middlewares.authentication_middleware.AuthenticationMiddleware"
+        ).middleware
+    )
 
     __setup_cors(app)
     return app

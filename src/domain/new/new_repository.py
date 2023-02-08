@@ -14,7 +14,7 @@ class NewRepository(Protocol):
 
     @abstractmethod
     def find_by_criteria(
-            self, criteria: FindNewsCriteria, sort_criteria: Optional[SortNewsCriteria] = None
+        self, criteria: FindNewsCriteria, sort_criteria: Optional[SortNewsCriteria] = None
     ) -> Iterable[New]:
         pass
 

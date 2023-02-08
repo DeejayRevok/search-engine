@@ -40,7 +40,7 @@ class IndexNewCommandHandler(CommandHandler):
             url=command.url,
             sentiment=Decimal(value=command.sentiment) if command.sentiment is not None else None,
             source=Source(name=command.source_name),
-            named_entities=self.__transform_named_entity_dicts(command.named_entities)
+            named_entities=self.__transform_named_entity_dicts(command.named_entities),
         )
 
     def __transform_named_entity_dicts(self, named_entity_dicts: list[dict]) -> list[NamedEntity]:
@@ -61,7 +61,7 @@ class IndexNewCommandHandler(CommandHandler):
     def __transform_dict_to_named_entity(self, named_entity_dict: dict) -> NamedEntity:
         return NamedEntity(
             value=named_entity_dict["text"],
-            named_entity_type=NamedEntityType(name=named_entity_dict["type"], description=None)
+            named_entity_type=NamedEntityType(name=named_entity_dict["type"], description=None),
         )
 
     def __get_indexed_new_event(self, new: New) -> IndexedNewEvent:
@@ -70,10 +70,10 @@ class IndexNewCommandHandler(CommandHandler):
             url=new.url,
             sentiment=new.sentiment,
             source_name=new.source.name,
-            named_entities=[{
-                "value": named_entity.value,
-                "type": named_entity.named_entity_type.name
-            } for named_entity in new.named_entities]
+            named_entities=[
+                {"value": named_entity.value, "type": named_entity.named_entity_type.name}
+                for named_entity in new.named_entities
+            ],
         )
 
     @classmethod

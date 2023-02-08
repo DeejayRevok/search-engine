@@ -9,6 +9,7 @@ from bus_station.passengers.serialization.passenger_deserializer import Passenge
 
 P = TypeVar("P", bound=Passenger)
 
+
 class IAMPassengerJSONDeserializer(PassengerDeserializer, Generic[P]):
     def deserialize(self, passenger_serialized: str, passenger_cls: Optional[Type[P]] = None) -> P:
         deserialized_data = self.__normalize_data(loads(passenger_serialized))

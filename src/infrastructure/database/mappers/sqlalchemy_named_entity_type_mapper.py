@@ -15,5 +15,5 @@ class SQLAlchemyNamedEntityTypeMapper(SQLAlchemyMapper):
             "named_entity_type",
             self._metadata,
             Column("name", String(), primary_key=True),
-            Column("description", String(), nullable=True)
+            Column("description", String(), nullable=True),
         )

@@ -19,17 +19,17 @@ class CreateNewspaperMutation(Mutation):
 
     @staticmethod
     @login_required
-    async def mutate(_, info: GraphQLResolveInfo, name: str, named_entities: TypingList[str]) -> CreateNewspaperMutation:
+    async def mutate(
+        _, info: GraphQLResolveInfo, name: str, named_entities: TypingList[str]
+    ) -> CreateNewspaperMutation:
         user_email: str = info.context["request"].user["email"]
 
         command_bus: CommandBus = container_builder.get(
             "bus_station.command_terminal.bus.synchronous.sync_command_bus.SyncCommandBus"
         )
 
-        command_bus.transport(CreateNewspaperCommand(
-            name=name,
-            user_email=user_email,
-            named_entities_values=named_entities
-        ))
+        command_bus.transport(
+            CreateNewspaperCommand(name=name, user_email=user_email, named_entities_values=named_entities)
+        )
 
         return CreateNewspaperMutation(success=True)

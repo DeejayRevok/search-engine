@@ -39,6 +39,6 @@ def load() -> None:
                 Argument.no_kw_argument(
                     "@infrastructure.jwt.jwt_authentication_token_decoder.JWTAuthenticationTokenDecoder"
                 )
-            ]
+            ],
         )
     )
