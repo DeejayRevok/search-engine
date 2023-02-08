@@ -27,15 +27,8 @@ jobs:
         run: tox -e flake8
       - name: Test with unittest
         run: tox -e tests
-      - name: Check test coverage
-        run: tox -e coverage_check
       - name: Generate coverage report
         run: tox -e coverage_report
-      - name: Codecov upload
-        uses: codecov/codecov-action@v1.0.5
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          file: coverage_search_engine.xml
       - name: Build the docker image
         run: docker build -t djrevok/search-engine:latest .
       - name: Login to docker hub

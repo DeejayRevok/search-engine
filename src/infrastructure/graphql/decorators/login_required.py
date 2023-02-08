@@ -5,7 +5,6 @@ from graphql import GraphQLResolveInfo
 
 
 def login_required(function: Callable):
-
     def wrapper(*args, **kwargs):
         graphql_info = None
         for arg in args:

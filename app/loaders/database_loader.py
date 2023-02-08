@@ -18,18 +18,10 @@ def load() -> None:
     container_builder.get(
         "infrastructure.database.mappers.sqlalchemy_named_entity_mapper.SQLAlchemyNamedEntityMapper"
     ).map()
-    container_builder.get(
-        "infrastructure.database.mappers.sqlalchemy_source_mapper.SQLAlchemySourceMapper"
-    ).map()
-    container_builder.get(
-        "infrastructure.database.mappers.sqlalchemy_user_mapper.SQLAlchemyUserMapper"
-    ).map()
-    container_builder.get(
-        "infrastructure.database.mappers.sqlalchemy_new_mapper.SQLAlchemyNewMapper"
-    ).map()
-    container_builder.get(
-        "infrastructure.database.mappers.sqlalchemy_newspaper_mapper.SQLAlchemyNewspaperMapper"
-    ).map()
+    container_builder.get("infrastructure.database.mappers.sqlalchemy_source_mapper.SQLAlchemySourceMapper").map()
+    container_builder.get("infrastructure.database.mappers.sqlalchemy_user_mapper.SQLAlchemyUserMapper").map()
+    container_builder.get("infrastructure.database.mappers.sqlalchemy_new_mapper.SQLAlchemyNewMapper").map()
+    container_builder.get("infrastructure.database.mappers.sqlalchemy_newspaper_mapper.SQLAlchemyNewspaperMapper").map()
 
 
 def __create_database_session(database_engine: Engine) -> Session:

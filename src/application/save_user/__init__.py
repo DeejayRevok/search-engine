@@ -12,7 +12,7 @@ def load() -> None:
                 Argument.no_kw_argument(
                     "@bus_station.command_terminal.bus.synchronous.sync_command_bus.SyncCommandBus"
                 ),
-            ]
+            ],
         )
     )
     container_builder.set_definition(
@@ -20,8 +20,10 @@ def load() -> None:
             "application.save_user.save_user_command_handler.SaveUserCommandHandler",
             "application.save_user.save_user_command_handler.SaveUserCommandHandler",
             [
-                Argument.no_kw_argument("@infrastructure.database.repositories.sqlalchemy_user_repository.SQLAlchemyUserRepository"),
-                Argument.no_kw_argument("@logging.Logger")
-            ]
+                Argument.no_kw_argument(
+                    "@infrastructure.database.repositories.sqlalchemy_user_repository.SQLAlchemyUserRepository"
+                ),
+                Argument.no_kw_argument("@logging.Logger"),
+            ],
         )
     )

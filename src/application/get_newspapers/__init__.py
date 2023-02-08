@@ -9,8 +9,10 @@ def load() -> None:
             "application.get_newspapers.get_newspapers_query_handler.GetNewspapersQueryHandler",
             "application.get_newspapers.get_newspapers_query_handler.GetNewspapersQueryHandler",
             [
-                Argument.no_kw_argument("@infrastructure.database.repositories.sqlalchemy_newspaper_repository.SQLAlchemyNewspaperRepository"),
-                Argument.no_kw_argument("@logging.Logger")
-            ]
+                Argument.no_kw_argument(
+                    "@infrastructure.database.repositories.sqlalchemy_newspaper_repository.SQLAlchemyNewspaperRepository"
+                ),
+                Argument.no_kw_argument("@logging.Logger"),
+            ],
         )
     )

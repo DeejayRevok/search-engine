@@ -9,7 +9,6 @@ from domain.newspaper.newspaper_repository import NewspaperRepository
 
 
 class SQLAlchemyNewspaperRepository(NewspaperRepository):
-
     def __init__(self, sqlalchemy_session: Session):
         self.__sqlalchemy_session = sqlalchemy_session
 

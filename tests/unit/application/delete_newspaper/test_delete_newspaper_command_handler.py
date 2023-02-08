@@ -12,16 +12,11 @@ class DeleteNewspaperCommandHandlerTest(TestCase):
     def setUp(self) -> None:
         self.newspaper_repository_mock = Mock(spec=NewspaperRepository)
         self.logger_mock = Mock(spec=Logger)
-        self.command_handler = DeleteNewspaperCommandHandler(
-            self.newspaper_repository_mock,
-            self.logger_mock
-        )
+        self.command_handler = DeleteNewspaperCommandHandler(self.newspaper_repository_mock, self.logger_mock)
 
     def test_handle_success(self):
         test_newspaper_id = uuid4()
-        test_command = DeleteNewspaperCommand(
-            newspaper_id=str(test_newspaper_id)
-        )
+        test_command = DeleteNewspaperCommand(newspaper_id=str(test_newspaper_id))
 
         self.command_handler.handle(test_command)
 

@@ -12,15 +12,10 @@ class TestSaveUserCommandHandler(TestCase):
     def setUp(self) -> None:
         self.user_repository_mock = Mock(spec=UserRepository)
         self.logger_mock = Mock(spec=Logger)
-        self.command_handler = SaveUserCommandHandler(
-            self.user_repository_mock,
-            self.logger_mock
-        )
+        self.command_handler = SaveUserCommandHandler(self.user_repository_mock, self.logger_mock)
 
     def test_handle_success(self):
-        test_command = SaveUserCommand(
-            email="test_user_email"
-        )
+        test_command = SaveUserCommand(email="test_user_email")
 
         self.command_handler.handle(test_command)
 

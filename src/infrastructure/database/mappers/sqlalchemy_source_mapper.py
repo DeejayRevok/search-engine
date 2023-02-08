@@ -11,8 +11,4 @@ class SQLAlchemySourceMapper(SQLAlchemyMapper):
         return Source
 
     def table(self) -> Table:
-        return Table(
-            "source",
-            self._metadata,
-            Column("name", String(), primary_key=True)
-        )
+        return Table("source", self._metadata, Column("name", String(), primary_key=True))

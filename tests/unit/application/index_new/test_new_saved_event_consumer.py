@@ -12,9 +12,7 @@ from application.index_new.new_saved_event_consumer import NewSavedEventConsumer
 class TestNewSavedEventConsumer(TestCase):
     def setUp(self) -> None:
         self.command_bus_mock = Mock(spec=CommandBus)
-        self.event_consumer = NewSavedEventConsumer(
-            self.command_bus_mock
-        )
+        self.event_consumer = NewSavedEventConsumer(self.command_bus_mock)
 
     def test_consume(self):
         test_event = NewSavedEvent(
@@ -23,10 +21,8 @@ class TestNewSavedEventConsumer(TestCase):
             source="test_source",
             date=2312332.98,
             language="test_language",
-            entities=[{
-                "value": "test_entity", "type":"test_type"
-            }],
-            sentiment=1.342
+            entities=[{"value": "test_entity", "type": "test_type"}],
+            sentiment=1.342,
         )
 
         self.event_consumer.consume(test_event)
@@ -37,8 +33,6 @@ class TestNewSavedEventConsumer(TestCase):
                 url="test_url",
                 sentiment=1.342,
                 source_name="test_source",
-                named_entities=[{
-                "value": "test_entity", "type":"test_type"
-            }]
+                named_entities=[{"value": "test_entity", "type": "test_type"}],
             )
         )

@@ -23,11 +23,7 @@ class TestIndexNewCommandHandler(TestCase):
         self.new_repository_mock = Mock(spec=NewRepository)
         self.event_bus_mock = Mock(spec=EventBus)
         self.logger_mock = Mock(spec=Logger)
-        self.command_handler = IndexNewCommandHandler(
-            self.new_repository_mock,
-            self.event_bus_mock,
-            self.logger_mock
-        )
+        self.command_handler = IndexNewCommandHandler(self.new_repository_mock, self.event_bus_mock, self.logger_mock)
 
     @patch("application.index_new.index_new_command_handler.uuid4")
     def test_handle_success_non_already_existing(self, uuid_mock):
@@ -42,8 +38,8 @@ class TestIndexNewCommandHandler(TestCase):
             named_entities=[
                 {"text": "test_named_entity_1", "type": "test_type_1"},
                 {"text": "test_named_entity_2", "type": "test_type_1"},
-                {"text": "test_named_entity_3", "type": "test_type_2"}
-            ]
+                {"text": "test_named_entity_3", "type": "test_type_2"},
+            ],
         )
 
         self.command_handler.handle(test_command)
@@ -55,12 +51,16 @@ class TestIndexNewCommandHandler(TestCase):
             sentiment=Decimal(12.23),
             source=Source(name="test_source"),
             named_entities=[
-                NamedEntity(value="test_named_entity_1", named_entity_type=NamedEntityType(name="test_type_1", description=None)),
-                NamedEntity(value="test_named_entity_2",
-                            named_entity_type=NamedEntityType(name="test_type_1", description=None)),
-                NamedEntity(value="test_named_entity_3",
-                            named_entity_type=NamedEntityType(name="test_type_2", description=None))
-            ]
+                NamedEntity(
+                    value="test_named_entity_1", named_entity_type=NamedEntityType(name="test_type_1", description=None)
+                ),
+                NamedEntity(
+                    value="test_named_entity_2", named_entity_type=NamedEntityType(name="test_type_1", description=None)
+                ),
+                NamedEntity(
+                    value="test_named_entity_3", named_entity_type=NamedEntityType(name="test_type_2", description=None)
+                ),
+            ],
         )
         self.new_repository_mock.save.assert_called_once_with(indexed_new)
         self.new_repository_mock.find_by_title.assert_called_once_with("test_title")
@@ -69,10 +69,10 @@ class TestIndexNewCommandHandler(TestCase):
             url="test_url",
             sentiment=Decimal(12.23),
             source_name="test_source",
-            named_entities=[{
-                "value": named_entity.value,
-                "type": named_entity.named_entity_type.name
-            } for named_entity in indexed_new.named_entities]
+            named_entities=[
+                {"value": named_entity.value, "type": named_entity.named_entity_type.name}
+                for named_entity in indexed_new.named_entities
+            ],
         )
         self.event_bus_mock.transport.assert_called_once_with(expected_event)
 
@@ -83,7 +83,7 @@ class TestIndexNewCommandHandler(TestCase):
             url="test_url",
             sentiment=Decimal("10.0"),
             source=Source(name="test_source"),
-            named_entities=[]
+            named_entities=[],
         )
         self.new_repository_mock.find_by_title.return_value = existing_new
         test_command = IndexNewCommand(
@@ -94,8 +94,8 @@ class TestIndexNewCommandHandler(TestCase):
             named_entities=[
                 {"text": "test_named_entity_1", "type": "test_type_1"},
                 {"text": "test_named_entity_2", "type": "test_type_1"},
-                {"text": "test_named_entity_3", "type": "test_type_2"}
-            ]
+                {"text": "test_named_entity_3", "type": "test_type_2"},
+            ],
         )
 
         self.command_handler.handle(test_command)
@@ -107,12 +107,16 @@ class TestIndexNewCommandHandler(TestCase):
             sentiment=Decimal(12.23),
             source=Source(name="test_source"),
             named_entities=[
-                NamedEntity(value="test_named_entity_1", named_entity_type=NamedEntityType(name="test_type_1", description=None)),
-                NamedEntity(value="test_named_entity_2",
-                            named_entity_type=NamedEntityType(name="test_type_1", description=None)),
-                NamedEntity(value="test_named_entity_3",
-                            named_entity_type=NamedEntityType(name="test_type_2", description=None))
-            ]
+                NamedEntity(
+                    value="test_named_entity_1", named_entity_type=NamedEntityType(name="test_type_1", description=None)
+                ),
+                NamedEntity(
+                    value="test_named_entity_2", named_entity_type=NamedEntityType(name="test_type_1", description=None)
+                ),
+                NamedEntity(
+                    value="test_named_entity_3", named_entity_type=NamedEntityType(name="test_type_2", description=None)
+                ),
+            ],
         )
         self.new_repository_mock.save.assert_called_once_with(indexed_new)
         self.new_repository_mock.find_by_title.assert_called_once_with("test_title")
@@ -121,9 +125,9 @@ class TestIndexNewCommandHandler(TestCase):
             url="test_url",
             sentiment=Decimal(12.23),
             source_name="test_source",
-            named_entities=[{
-                "value": named_entity.value,
-                "type": named_entity.named_entity_type.name
-            } for named_entity in indexed_new.named_entities]
+            named_entities=[
+                {"value": named_entity.value, "type": named_entity.named_entity_type.name}
+                for named_entity in indexed_new.named_entities
+            ],
         )
         self.event_bus_mock.transport.assert_called_once_with(expected_event)

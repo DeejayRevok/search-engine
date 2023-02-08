@@ -9,7 +9,6 @@ from domain.named_entity.named_entity_repository import NamedEntityRepository
 
 
 class SQLAlchemyNamedEntityRepository(NamedEntityRepository):
-
     def __init__(self, sqlalchemy_session: Session):
         self.__sqlalchemy_session = sqlalchemy_session
 

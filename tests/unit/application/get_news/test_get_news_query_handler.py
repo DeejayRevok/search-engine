@@ -19,10 +19,7 @@ class TestGetNewsQueryHandler(TestCase):
     def setUp(self) -> None:
         self.new_repository_mock = Mock(spec=NewRepository)
         self.logger_mock = Mock(spec=Logger)
-        self.query_handler = GetNewsQueryHandler(
-            self.new_repository_mock,
-            self.logger_mock
-        )
+        self.query_handler = GetNewsQueryHandler(self.new_repository_mock, self.logger_mock)
 
     def test_handle_success_no_sorting(self):
         test_new = New(
@@ -31,7 +28,7 @@ class TestGetNewsQueryHandler(TestCase):
             url="test_url",
             sentiment=Decimal("10.0"),
             source=Source(name="test_source"),
-            named_entities=[]
+            named_entities=[],
         )
         self.new_repository_mock.find_by_criteria.return_value = [test_new, test_new]
         test_query = GetNewsQuery(
@@ -39,18 +36,21 @@ class TestGetNewsQueryHandler(TestCase):
             any_named_entity=["test_named_entity_1", "test_named_entity_2"],
             all_named_entities=["test_named_entity_3", "test_named_entity_4"],
             source="test_source",
-            sorting=None
+            sorting=None,
         )
 
         query_response = self.query_handler.handle(test_query)
 
         self.assertEqual([test_new, test_new], query_response.data)
-        self.new_repository_mock.find_by_criteria.assert_called_once_with(FindNewsCriteria(
-            title="test_new",
-            any_named_entity_value=["test_named_entity_1", "test_named_entity_2"],
-            all_named_entities_values=["test_named_entity_3", "test_named_entity_4"],
-            source_name="test_source",
-        ), None)
+        self.new_repository_mock.find_by_criteria.assert_called_once_with(
+            FindNewsCriteria(
+                title="test_new",
+                any_named_entity_value=["test_named_entity_1", "test_named_entity_2"],
+                all_named_entities_values=["test_named_entity_3", "test_named_entity_4"],
+                source_name="test_source",
+            ),
+            None,
+        )
 
     def test_handle_success_sorting(self):
         test_new = New(
@@ -59,7 +59,7 @@ class TestGetNewsQueryHandler(TestCase):
             url="test_url",
             sentiment=Decimal("10.0"),
             source=Source(name="test_source"),
-            named_entities=[]
+            named_entities=[],
         )
         self.new_repository_mock.find_by_criteria.return_value = [test_new, test_new]
         test_query = GetNewsQuery(
@@ -67,15 +67,18 @@ class TestGetNewsQueryHandler(TestCase):
             any_named_entity=["test_named_entity_1", "test_named_entity_2"],
             all_named_entities=["test_named_entity_3", "test_named_entity_4"],
             source="test_source",
-            sorting="SENTIMENT_ASCENDANT"
+            sorting="SENTIMENT_ASCENDANT",
         )
 
         query_response = self.query_handler.handle(test_query)
 
         self.assertEqual([test_new, test_new], query_response.data)
-        self.new_repository_mock.find_by_criteria.assert_called_once_with(FindNewsCriteria(
-            title="test_new",
-            any_named_entity_value=["test_named_entity_1", "test_named_entity_2"],
-            all_named_entities_values=["test_named_entity_3", "test_named_entity_4"],
-            source_name="test_source",
-        ), SortNewsCriteria.SENTIMENT_ASCENDANT)
+        self.new_repository_mock.find_by_criteria.assert_called_once_with(
+            FindNewsCriteria(
+                title="test_new",
+                any_named_entity_value=["test_named_entity_1", "test_named_entity_2"],
+                all_named_entities_values=["test_named_entity_3", "test_named_entity_4"],
+                source_name="test_source",
+            ),
+            SortNewsCriteria.SENTIMENT_ASCENDANT,
+        )

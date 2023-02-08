@@ -13,15 +13,11 @@ class JWTAuthenticationTokenDecoder(AuthenticationTokenDecoder):
     def decode(self, token_encoded: str) -> AuthenticationToken:
         jwt_signing_key = self.__get_jwt_signing_key()
         decoded_token_data = jwt.decode(
-            jwt=token_encoded,
-            key=jwt_signing_key.signing_key,
-            algorithms=[jwt_signing_key.signing_algorithm]
+            jwt=token_encoded, key=jwt_signing_key.signing_key, algorithms=[jwt_signing_key.signing_algorithm]
         )
         if "sub" not in decoded_token_data:
             raise ValueError("Missing sub field in authentication token")
-        return AuthenticationToken(
-            user_email=decoded_token_data["sub"]
-        )
+        return AuthenticationToken(user_email=decoded_token_data["sub"])
 
     def __get_jwt_signing_key(self) -> JWTSigningKey:
         jwt_signing_key = self.__jwt_signing_key_fetcher.fetch()

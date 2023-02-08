@@ -23,16 +23,14 @@ class GetNewsQueryHandler(QueryHandler):
         result = self.__new_repository.find_by_criteria(find_criteria, sort_criteria)
 
         self.__logger.info("Finished getting news")
-        return QueryResponse(
-            data=result
-        )
+        return QueryResponse(data=result)
 
     def __get_find_criteria(self, query: GetNewsQuery) -> FindNewsCriteria:
         return FindNewsCriteria(
             title=query.title,
             any_named_entity_value=query.any_named_entity,
             all_named_entities_values=query.all_named_entities,
-            source_name=query.source
+            source_name=query.source,
         )
 
     def __get_sort_criteria(self, query: GetNewsQuery) -> Optional[SortNewsCriteria]:

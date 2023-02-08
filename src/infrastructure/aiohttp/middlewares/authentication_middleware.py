@@ -7,7 +7,6 @@ from domain.authentication.authentication_token_decoder import AuthenticationTok
 
 
 class AuthenticationMiddleware:
-
     def __init__(self, authentication_token_decoder: AuthenticationTokenDecoder):
         self.__authentication_token_decoder = authentication_token_decoder
 
@@ -17,13 +16,12 @@ class AuthenticationMiddleware:
             request_user: Optional[dict] = None
             if auth_token_encoded is not None:
                 auth_token = self.__authentication_token_decoder.decode(auth_token_encoded)
-                request_user = {
-                    "email": auth_token.user_email
-                }
+                request_user = {"email": auth_token.user_email}
 
             request.user = request_user
             response = await handler(request)
             return response
+
         return middleware_handler
 
     async def __get_authentication_token(self, request: Request) -> Optional[str]:

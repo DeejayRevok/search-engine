@@ -22,9 +22,5 @@ class Newspaper(ObjectType):
         query_bus: QueryBus = container_builder.get(
             "bus_station.query_terminal.bus.synchronous.sync_query_bus.SyncQueryBus"
         )
-        query = GetNewsQuery(
-            any_named_entity=[named_entity["value"] for named_entity in root["named_entities"]]
-        )
-        return [
-            asdict(new) for new in query_bus.transport(query).data
-        ]
+        query = GetNewsQuery(any_named_entity=[named_entity["value"] for named_entity in root["named_entities"]])
+        return [asdict(new) for new in query_bus.transport(query).data]

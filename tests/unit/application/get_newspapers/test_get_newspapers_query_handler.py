@@ -14,26 +14,16 @@ class TestGetNewspapersQueryHandler(TestCase):
     def setUp(self) -> None:
         self.newspaper_repository_mock = Mock(spec=NewspaperRepository)
         self.logger_mock = Mock(spec=Logger)
-        self.query_handler = GetNewspapersQueryHandler(
-            self.newspaper_repository_mock,
-            self.logger_mock
-        )
+        self.query_handler = GetNewspapersQueryHandler(self.newspaper_repository_mock, self.logger_mock)
 
     def test_handle_success(self):
-        test_newspaper = Newspaper(
-            id=uuid4(),
-            name="test_newspaper",
-            user_email="test_user",
-            named_entities=[]
-        )
+        test_newspaper = Newspaper(id=uuid4(), name="test_newspaper", user_email="test_user", named_entities=[])
         self.newspaper_repository_mock.find_by_criteria.return_value = [test_newspaper, test_newspaper]
-        test_query = GetNewspapersQuery(
-            user_email="test_user"
-        )
+        test_query = GetNewspapersQuery(user_email="test_user")
 
         query_response = self.query_handler.handle(test_query)
 
         self.assertEqual([test_newspaper, test_newspaper], query_response.data)
-        self.newspaper_repository_mock.find_by_criteria.assert_called_once_with(FindNewspaperCriteria(
-            user_email="test_user"
-        ))
+        self.newspaper_repository_mock.find_by_criteria.assert_called_once_with(
+            FindNewspaperCriteria(user_email="test_user")
+        )

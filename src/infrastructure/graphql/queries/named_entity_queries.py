@@ -20,6 +20,4 @@ class NamedEntityQueries(ObjectType):
             "bus_station.query_terminal.bus.synchronous.sync_query_bus.SyncQueryBus"
         )
         query = GetNamedEntitiesQuery()
-        return [
-            asdict(named_entity) for named_entity in query_bus.transport(query).data
-        ]
+        return [asdict(named_entity) for named_entity in query_bus.transport(query).data]

@@ -8,8 +8,6 @@ def load() -> None:
         Definition(
             "infrastructure.jwt.jwt_authentication_token_decoder.JWTAuthenticationTokenDecoder",
             "infrastructure.jwt.jwt_authentication_token_decoder.JWTAuthenticationTokenDecoder",
-            [
-                Argument.no_kw_argument("@infrastructure.iam.iam_jwt_signing_key_fetcher.IAMJWTSigningKeyFetcher")
-            ]
+            [Argument.no_kw_argument("@infrastructure.iam.iam_jwt_signing_key_fetcher.IAMJWTSigningKeyFetcher")],
         )
     )

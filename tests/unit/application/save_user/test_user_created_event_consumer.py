@@ -11,19 +11,11 @@ from domain.user.user_created_event import UserCreatedEvent
 class TestUserCreatedEventConsumer(TestCase):
     def setUp(self) -> None:
         self.command_bus_mock = Mock(spec=CommandBus)
-        self.event_consumer = UserCreatedEventConsumer(
-            self.command_bus_mock
-        )
+        self.event_consumer = UserCreatedEventConsumer(self.command_bus_mock)
 
     def test_consume_success(self):
-        test_event = UserCreatedEvent(
-            email="test_user_email"
-        )
+        test_event = UserCreatedEvent(email="test_user_email")
 
         self.event_consumer.consume(test_event)
 
-        self.command_bus_mock.transport.assert_called_once_with(
-            SaveUserCommand(
-                email="test_user_email"
-            )
-        )
+        self.command_bus_mock.transport.assert_called_once_with(SaveUserCommand(email="test_user_email"))

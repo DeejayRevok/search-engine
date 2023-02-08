@@ -33,11 +33,13 @@ class UpdateNewspaperMutation(Mutation):
             "bus_station.command_terminal.bus.synchronous.sync_command_bus.SyncCommandBus"
         )
 
-        command_bus.transport(UpdateNewspaperCommand(
-            original_name=original_name,
-            new_name=new_name,
-            user_email=user_email,
-            new_named_entities_values=new_named_entities
-        ))
+        command_bus.transport(
+            UpdateNewspaperCommand(
+                original_name=original_name,
+                new_name=new_name,
+                user_email=user_email,
+                new_named_entities_values=new_named_entities,
+            )
+        )
 
         return UpdateNewspaperMutation(success=True)

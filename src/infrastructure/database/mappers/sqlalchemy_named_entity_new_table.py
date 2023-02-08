@@ -9,5 +9,5 @@ class SQLAlchemyNamedEntityNewTable(SQLAlchemyTable):
             "named_entity_new",
             self._metadata,
             Column("named_entity_value", ForeignKey("named_entity.value"), primary_key=True),
-            Column("new_id", ForeignKey("new.id"), primary_key=True)
+            Column("new_id", ForeignKey("new.id"), primary_key=True),
         )

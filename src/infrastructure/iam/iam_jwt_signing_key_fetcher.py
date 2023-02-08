@@ -48,7 +48,4 @@ class IAMJWTSigningKeyFetcher(JWTSigningKeyFetcher):
         n = int(jwt_key_data["n"])
         algorithm = jwt_key_data["alg"]
 
-        return JWTSigningKey(
-            signing_key=RSAPublicNumbers(e, n).public_key(),
-            signing_algorithm=algorithm
-        )
+        return JWTSigningKey(signing_key=RSAPublicNumbers(e, n).public_key(), signing_algorithm=algorithm)
