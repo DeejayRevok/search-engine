@@ -12,6 +12,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      - name: Setup env
+        run: cp .env.example .env
       - name: Check formatting
         run: docker-compose run search-engine tox -e black -- --check
       - name: Check style
