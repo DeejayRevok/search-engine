@@ -11,11 +11,13 @@ def load() -> None:
             [
                 Argument(
                     "in_memory_repository",
-                    "@bus_station.passengers.passenger_record.in_memory_passenger_record_repository.InMemoryPassengerRecordRepository",
+                    "@bus_station.passengers.passenger_record"
+                    ".in_memory_passenger_record_repository.InMemoryPassengerRecordRepository",
                 ),
                 Argument(
                     "command_handler_resolver",
-                    "@bus_station.shared_terminal.bus_stop_resolver.pypendency_bus_stop_resolver.PypendencyBusStopResolver",
+                    "@bus_station.shared_terminal.bus_stop_resolver"
+                    ".pypendency_bus_stop_resolver.PypendencyBusStopResolver",
                 ),
                 Argument("fqn_getter", "@bus_station.shared_terminal.fqn_getter.FQNGetter"),
                 Argument(

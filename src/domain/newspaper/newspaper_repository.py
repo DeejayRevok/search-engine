@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import Protocol, List, Iterable, Optional
+from typing import Protocol, Iterable, Optional
 from uuid import UUID
 
 from domain.newspaper.find_newspaper_criteria import FindNewspaperCriteria

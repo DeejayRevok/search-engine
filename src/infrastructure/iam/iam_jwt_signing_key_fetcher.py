@@ -26,7 +26,7 @@ class IAMJWTSigningKeyFetcher(JWTSigningKeyFetcher):
         try:
             jwks_response = get(self.__iam_jwks_path)
         except OSError:
-            self.__logger.warning(f"Error connecting with IAM when fetching jwt signing key")
+            self.__logger.warning("Error connecting with IAM when fetching jwt signing key")
             return None
 
         try:

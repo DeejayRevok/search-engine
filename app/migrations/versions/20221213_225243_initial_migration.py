@@ -2,7 +2,7 @@
 Initial migration
 
 Revision ID: 1af4b780ddf8
-Revises: 
+Revises:
 Create Date: 2022-12-13 22:52:43.279341
 
 """

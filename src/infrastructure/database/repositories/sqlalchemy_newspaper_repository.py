@@ -1,7 +1,7 @@
 from typing import Optional, List
 from uuid import UUID
 
-from sqlalchemy.orm import Session, Query
+from sqlalchemy.orm import Session
 
 from domain.newspaper.find_newspaper_criteria import FindNewspaperCriteria
 from domain.newspaper.newspaper import Newspaper
