@@ -13,6 +13,6 @@ spec:
           pathType: Prefix
           backend:
             service:
-              name: search-engine
+              name: search-engine-web-server
               port:
-                number: 8083
+                number: 8081

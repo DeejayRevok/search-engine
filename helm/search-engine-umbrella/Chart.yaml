@@ -1,0 +1,22 @@
+name: search-engine-umbrella
+description: Search engine umbrella helm chart
+version: 0.0.0
+appVersion: latest
+apiVersion: v1
+keywords:
+  - search-engine
+sources:
+home:
+dependencies:
+  - name: search-engine
+    version: 0.0.0
+    repository: "file://../search-engine"
+  - name: redis
+    version: 17.4.3
+    repository: "https://charts.bitnami.com/bitnami"
+  - name: rabbitmq
+    version: 11.4.0
+    repository: "https://charts.bitnami.com/bitnami"
+  - name: monitor
+    version: 1.0.2
+    repository: "https://deejayrevok.github.io/helm-repo"

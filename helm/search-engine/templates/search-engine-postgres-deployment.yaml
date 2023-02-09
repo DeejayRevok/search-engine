@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: search-engine-postgres
+  name: search-engine-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: search-engine-postgres
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: search-engine-postgres
+    spec:
+      containers:
+      - envFrom:
+          - configMapRef:
+              name: search-engine-configmap
+        image: postgres:15.0
+        imagePullPolicy: ""
+        name: search-engine-postgres
+        ports:
+        - containerPort: 5434
+        resources: {}
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: search-engine-postgres-data
+      restartPolicy: Always
+      serviceAccountName: ""
+      volumes:
+      - name: search-engine-postgres-data
+        persistentVolumeClaim:
+          claimName: search-engine-postgres-data
+status: {}

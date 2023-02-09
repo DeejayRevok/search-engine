@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: search-engine-user-created-consumer
+  name: search-engine-user-created-consumer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: search-engine-user-created-consumer
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: search-engine-user-created-consumer
+    spec:
+      initContainers:
+      - name: search-engine-migrations
+        image: 'djrevok/search-engine:{{ .Chart.AppVersion }}'
+        workingDir: /app/app/migrations
+        command:
+          - alembic
+          - upgrade
+          - head
+        envFrom:
+          - configMapRef:
+              name: search-engine-configmap
+      containers:
+      - envFrom:
+          - configMapRef:
+              name: search-engine-configmap
+        image: 'djrevok/search-engine:{{ .Chart.AppVersion }}'
+        name: search-engine-user-created-consumer
+        resources: {}
+        command:
+          - make
+          - run_kombu_iam_event_consumer
+          - EVENT_NAME=event.user_created
+          - CONSUMER_NAME=event_consumer.search_engine.save_user.user_created
+      restartPolicy: Always
+      serviceAccountName: ""
+status: {}

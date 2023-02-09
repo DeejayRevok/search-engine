@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: search-engine-web-server
+  name: search-engine-web-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: search-engine-web-server
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: search-engine-web-server
+    spec:
+      initContainers:
+      - name: search-engine-migrations
+        image: 'djrevok/search-engine:{{ .Chart.AppVersion }}'
+        workingDir: /app/app/migrations
+        command:
+          - alembic
+          - upgrade
+          - head
+        envFrom:
+          - configMapRef:
+              name: search-engine-configmap
+      containers:
+      - envFrom:
+          - configMapRef:
+              name: search-engine-configmap
+        image: 'djrevok/search-engine:{{ .Chart.AppVersion }}'
+        name: search-engine-web-server
+        ports:
+        - containerPort: 8081
+        resources: {}
+        command:
+          - make
+          - run_web_server
+      restartPolicy: Always
+      serviceAccountName: ""
+status: {}
