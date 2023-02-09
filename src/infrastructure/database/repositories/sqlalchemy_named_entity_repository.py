@@ -1,6 +1,6 @@
 from typing import List
 
-from sqlalchemy.orm import Session, Query
+from sqlalchemy.orm import Session
 
 from domain.named_entity.find_named_entities_criteria import FindNamedEntitiesCriteria
 from domain.named_entity.named_entity import NamedEntity

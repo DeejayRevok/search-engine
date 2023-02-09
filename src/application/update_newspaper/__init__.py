@@ -10,10 +10,12 @@ def load() -> None:
             "application.update_newspaper.update_newspaper_command_handler.UpdateNewspaperCommandHandler",
             [
                 Argument.no_kw_argument(
-                    "@infrastructure.database.repositories.sqlalchemy_newspaper_repository.SQLAlchemyNewspaperRepository"
+                    "@infrastructure.database.repositories"
+                    ".sqlalchemy_newspaper_repository.SQLAlchemyNewspaperRepository"
                 ),
                 Argument.no_kw_argument(
-                    "@infrastructure.database.repositories.sqlalchemy_named_entity_repository.SQLAlchemyNamedEntityRepository"
+                    "@infrastructure.database.repositories"
+                    ".sqlalchemy_named_entity_repository.SQLAlchemyNamedEntityRepository"
                 ),
                 Argument.no_kw_argument("@logging.Logger"),
             ],

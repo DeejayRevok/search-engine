@@ -10,7 +10,8 @@ def load() -> None:
             "application.delete_newspaper.delete_newspaper_command_handler.DeleteNewspaperCommandHandler",
             [
                 Argument.no_kw_argument(
-                    "@infrastructure.database.repositories.sqlalchemy_newspaper_repository.SQLAlchemyNewspaperRepository"
+                    "@infrastructure.database.repositories"
+                    ".sqlalchemy_newspaper_repository.SQLAlchemyNewspaperRepository"
                 ),
                 Argument.no_kw_argument("@logging.Logger"),
             ],

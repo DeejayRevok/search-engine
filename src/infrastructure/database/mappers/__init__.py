@@ -20,8 +20,10 @@ def load() -> None:
     )
     container_builder.set_definition(
         Definition(
-            "infrastructure.database.mappers.sqlalchemy_named_entity_newspaper_table.SQLAlchemyNamedEntityNewspaperTable",
-            "infrastructure.database.mappers.sqlalchemy_named_entity_newspaper_table.SQLAlchemyNamedEntityNewspaperTable",
+            "infrastructure.database.mappers"
+            ".sqlalchemy_named_entity_newspaper_table.SQLAlchemyNamedEntityNewspaperTable",
+            "infrastructure.database.mappers"
+            ".sqlalchemy_named_entity_newspaper_table.SQLAlchemyNamedEntityNewspaperTable",
             [Argument.no_kw_argument("@sqlalchemy.MetaData")],
         )
     )
@@ -51,7 +53,8 @@ def load() -> None:
             [
                 Argument.no_kw_argument("@sqlalchemy.MetaData"),
                 Argument.no_kw_argument(
-                    "@infrastructure.database.mappers.sqlalchemy_named_entity_newspaper_table.SQLAlchemyNamedEntityNewspaperTable"
+                    "@infrastructure.database.mappers"
+                    ".sqlalchemy_named_entity_newspaper_table.SQLAlchemyNamedEntityNewspaperTable"
                 ),
             ],
         )

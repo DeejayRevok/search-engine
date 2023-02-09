@@ -11,11 +11,13 @@ def load() -> None:
             [
                 Argument(
                     "redis_repository",
-                    "@bus_station.passengers.passenger_record.redis_passenger_record_repository.RedisPassengerRecordRepository",
+                    "@bus_station.passengers.passenger_record"
+                    ".redis_passenger_record_repository.RedisPassengerRecordRepository",
                 ),
                 Argument(
                     "query_handler_resolver",
-                    "@bus_station.shared_terminal.bus_stop_resolver.pypendency_bus_stop_resolver.PypendencyBusStopResolver",
+                    "@bus_station.shared_terminal.bus_stop_resolver"
+                    ".pypendency_bus_stop_resolver.PypendencyBusStopResolver",
                 ),
                 Argument("fqn_getter", "@bus_station.shared_terminal.fqn_getter.FQNGetter"),
                 Argument(
@@ -40,7 +42,8 @@ def load() -> None:
                     "@bus_station.passengers.serialization.passenger_json_serializer.PassengerJSONSerializer"
                 ),
                 Argument.no_kw_argument(
-                    "@bus_station.query_terminal.serialization.query_response_json_deserializer.QueryResponseJSONDeserializer"
+                    "@bus_station.query_terminal.serialization"
+                    ".query_response_json_deserializer.QueryResponseJSONDeserializer"
                 ),
                 Argument.no_kw_argument("@bus_station.query_terminal.registry.redis_query_registry.RedisQueryRegistry"),
             ],

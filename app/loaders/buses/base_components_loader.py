@@ -7,8 +7,10 @@ from pypendency.definition import Definition
 def load() -> None:
     container_builder.set_definition(
         Definition(
-            "bus_station.passengers.passenger_record.in_memory_passenger_record_repository.InMemoryPassengerRecordRepository",
-            "bus_station.passengers.passenger_record.in_memory_passenger_record_repository.InMemoryPassengerRecordRepository",
+            "bus_station.passengers.passenger_record"
+            ".in_memory_passenger_record_repository.InMemoryPassengerRecordRepository",
+            "bus_station.passengers.passenger_record"
+            ".in_memory_passenger_record_repository.InMemoryPassengerRecordRepository",
         )
     )
     container_builder.set_definition(
