@@ -12,23 +12,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python 3.10.9
-        uses: actions/setup-python@v1
-        with:
-          python-version: 3.10.9
-      - name: Install dependencies
-        run: |
-          pip install --upgrade pip
-          pip install -r requirements-dev.txt
-          pip install -r requirements-prod.txt
       - name: Check formatting
-        run: tox -e black -- --check
+        run: docker-compose run search-engine tox -e black -- --check
       - name: Check style
-        run: tox -e flake8
+        run: docker-compose run search-engine tox -e flake8
       - name: Test with unittest
-        run: tox -e tests
+        run: docker-compose run search-engine tox -e tests
       - name: Generate coverage report
-        run: tox -e coverage_report
+        run: docker-compose run search-engine tox -e coverage_report
       - name: Build the docker image
         run: docker build -t djrevok/search-engine:latest .
       - name: Login to docker hub

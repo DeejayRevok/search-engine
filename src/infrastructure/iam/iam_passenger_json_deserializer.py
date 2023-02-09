@@ -23,7 +23,6 @@ class IAMPassengerJSONDeserializer(PassengerDeserializer, Generic[P]):
     def __from_passenger_cls(self, passenger_cls: Type[P], passenger_data: dict) -> P:
         passenger_cls_field_values = dict()
         for passenger_field in fields(passenger_cls):
-            passenger_field: Field = passenger_field
             if passenger_field.default is MISSING and passenger_field.name not in passenger_data:
                 raise PassengerDeserializationError(passenger_cls, f"Missing value for field {passenger_field.name}")
             if passenger_field.name not in passenger_data:
