@@ -1,4 +1,4 @@
-from dataclasses import fields, Field, MISSING
+from dataclasses import fields, MISSING
 from json import loads
 from typing import Generic, TypeVar, Optional, Type
 
