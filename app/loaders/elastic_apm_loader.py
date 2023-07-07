@@ -3,7 +3,6 @@ from logging import ERROR
 from elasticapm import Client
 from elasticapm.utils.logging import get_logger
 from yandil.configuration.configuration_container import default_configuration_container
-from yandil.configuration.environment import Environment
 from yandil.container import default_container
 
 

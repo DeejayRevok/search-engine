@@ -14,9 +14,5 @@ def load() -> None:
     command_middleware_receiver.add_middleware_definition(
         LoggingCommandMiddleware, default_container[Logger], lazy=False
     )
-    command_middleware_receiver.add_middleware_definition(
-        TimingCommandMiddleware, default_container[Logger], lazy=True
-    )
-    command_middleware_receiver.add_middleware_definition(
-        APMCommandMiddleware, default_container[Client], lazy=False
-    )
+    command_middleware_receiver.add_middleware_definition(TimingCommandMiddleware, default_container[Logger], lazy=True)
+    command_middleware_receiver.add_middleware_definition(APMCommandMiddleware, default_container[Client], lazy=False)
