@@ -1,6 +1,7 @@
 from bus_station.query_terminal.bus.query_bus import QueryBus
+from bus_station.query_terminal.bus.synchronous.distributed.rpyc_query_bus import RPyCQueryBus
 from graphene import ObjectType, Float, String, List, Field, UUID
-from pypendency.builder import container_builder
+from yandil.container import default_container
 
 from infrastructure.graphql.models.named_entity import NamedEntity
 from infrastructure.graphql.models.new_detail import NewDetail
@@ -19,9 +20,7 @@ class New(ObjectType):
 
     @staticmethod
     async def resolve_detail(root: dict, _) -> dict:
-        query_bus: QueryBus = container_builder.get(
-            "bus_station.query_terminal.bus.synchronous.distributed.rpyc_query_bus.RPyCQueryBus"
-        )
+        query_bus: QueryBus = default_container.get[RPyCQueryBus]
         query = GetNewQuery(title=root["title"])
         query_response = query_bus.transport(query)
         return {

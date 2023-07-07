@@ -1,10 +1,10 @@
 from __future__ import annotations
 from typing import List as TypingList
 
-from bus_station.command_terminal.bus.command_bus import CommandBus
+from bus_station.command_terminal.bus.synchronous.sync_command_bus import SyncCommandBus
 from graphene import Mutation, String, List, Boolean
 from graphql import GraphQLResolveInfo
-from pypendency.builder import container_builder
+from yandil.container import default_container
 
 from application.update_newspaper.update_newspaper_command import UpdateNewspaperCommand
 from infrastructure.graphql.decorators.login_required import login_required
@@ -29,9 +29,7 @@ class UpdateNewspaperMutation(Mutation):
     ) -> UpdateNewspaperMutation:
         user_email: str = info.context["request"].user["email"]
 
-        command_bus: CommandBus = container_builder.get(
-            "bus_station.command_terminal.bus.synchronous.sync_command_bus.SyncCommandBus"
-        )
+        command_bus = default_container[SyncCommandBus]
 
         command_bus.transport(
             UpdateNewspaperCommand(

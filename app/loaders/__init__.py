@@ -1,4 +1,5 @@
 from app.loaders.logger_loader import load as load_logger
+from app.loaders.configuration_loader import load as load_configuration
 from app.loaders.database_loader import load as load_database
 from app.loaders.redis_client_loader import load as load_redis
 from app.loaders.rabbitmq_connection_loader import load as load_rabbitmq
@@ -15,6 +16,7 @@ from app.loaders.buses.query.middlewares_loader import load as load_query_bus_mi
 
 def load_app():
     load_logger()
+    load_configuration()
     load_container()
     load_redis()
     load_rabbitmq()

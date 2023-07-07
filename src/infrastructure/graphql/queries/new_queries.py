@@ -1,9 +1,9 @@
 from dataclasses import asdict
 from typing import List as TypingList, Optional
 
-from bus_station.query_terminal.bus.query_bus import QueryBus
+from bus_station.query_terminal.bus.synchronous.sync_query_bus import SyncQueryBus
 from graphene import ObjectType, Field, List, String, UUID, Enum, Argument
-from pypendency.builder import container_builder
+from yandil.container import default_container
 
 from application.get_new.get_new_query import GetNewQuery
 from application.get_news.get_news_query import GetNewsQuery
@@ -30,9 +30,7 @@ class NewQueries(ObjectType):
     @staticmethod
     @login_required
     async def resolve_news_by_named_entities_union(_, __, named_entities: TypingList[str]) -> TypingList[dict]:
-        query_bus: QueryBus = container_builder.get(
-            "bus_station.query_terminal.bus.synchronous.sync_query_bus.SyncQueryBus"
-        )
+        query_bus = default_container[SyncQueryBus]
         query = GetNewsQuery(any_named_entity=named_entities)
         return [asdict(new) for new in query_bus.transport(query).data]
 
@@ -45,9 +43,7 @@ class NewQueries(ObjectType):
         source: Optional[str] = None,
         sort_criteria: Optional[SortNewsCriteria] = None,
     ) -> TypingList[dict]:
-        query_bus: QueryBus = container_builder.get(
-            "bus_station.query_terminal.bus.synchronous.sync_query_bus.SyncQueryBus"
-        )
+        query_bus = default_container[SyncQueryBus]
         query = GetNewsQuery(
             title=title, source=source, sorting=sort_criteria.value if sort_criteria is not None else None
         )
@@ -56,9 +52,7 @@ class NewQueries(ObjectType):
     @staticmethod
     @login_required
     async def resolve_new(_, __, id: UUID) -> Optional[dict]:
-        query_bus: QueryBus = container_builder.get(
-            "bus_station.query_terminal.bus.synchronous.sync_query_bus.SyncQueryBus"
-        )
+        query_bus = default_container[SyncQueryBus]
         query = GetNewQuery(id=str(id))
         new = query_bus.transport(query).data
         return asdict(new) if new is not None else None
