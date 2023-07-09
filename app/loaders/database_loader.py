@@ -1,27 +1,30 @@
 import os
 
-from pypendency.builder import container_builder
 from sqlalchemy import MetaData, create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import sessionmaker, Session, scoped_session
+from yandil.container import default_container
+
+from infrastructure.database.mappers.sqlalchemy_named_entity_mapper import SQLAlchemyNamedEntityMapper
+from infrastructure.database.mappers.sqlalchemy_named_entity_type_mapper import SQLAlchemyNamedEntityTypeMapper
+from infrastructure.database.mappers.sqlalchemy_new_mapper import SQLAlchemyNewMapper
+from infrastructure.database.mappers.sqlalchemy_newspaper_mapper import SQLAlchemyNewspaperMapper
+from infrastructure.database.mappers.sqlalchemy_source_mapper import SQLAlchemySourceMapper
+from infrastructure.database.mappers.sqlalchemy_user_mapper import SQLAlchemyUserMapper
 
 
 def load() -> None:
-    container_builder.set("sqlalchemy.MetaData", MetaData())
+    default_container.add(MetaData)
     database_engine = __create_database_engine()
-    container_builder.set("sqlalchemy.engine.Engine", database_engine)
-    container_builder.set("sqlalchemy.orm.session.Session", __create_database_session(database_engine))
+    default_container[Engine] = database_engine
+    default_container[Session] = __create_database_session(database_engine)
 
-    container_builder.get(
-        "infrastructure.database.mappers.sqlalchemy_named_entity_type_mapper.SQLAlchemyNamedEntityTypeMapper"
-    ).map()
-    container_builder.get(
-        "infrastructure.database.mappers.sqlalchemy_named_entity_mapper.SQLAlchemyNamedEntityMapper"
-    ).map()
-    container_builder.get("infrastructure.database.mappers.sqlalchemy_source_mapper.SQLAlchemySourceMapper").map()
-    container_builder.get("infrastructure.database.mappers.sqlalchemy_user_mapper.SQLAlchemyUserMapper").map()
-    container_builder.get("infrastructure.database.mappers.sqlalchemy_new_mapper.SQLAlchemyNewMapper").map()
-    container_builder.get("infrastructure.database.mappers.sqlalchemy_newspaper_mapper.SQLAlchemyNewspaperMapper").map()
+    default_container[SQLAlchemyNamedEntityTypeMapper].map()
+    default_container[SQLAlchemyNamedEntityMapper].map()
+    default_container[SQLAlchemySourceMapper].map()
+    default_container[SQLAlchemyUserMapper].map()
+    default_container[SQLAlchemyNewMapper].map()
+    default_container[SQLAlchemyNewspaperMapper].map()
 
 
 def __create_database_session(database_engine: Engine) -> Session:

@@ -3,7 +3,9 @@ import logging
 from logging.config import fileConfig
 
 from alembic import context
-from pypendency.builder import container_builder
+from sqlalchemy import MetaData
+from sqlalchemy.engine import Engine
+from yandil.container import default_container
 
 from app.loaders.container_loader import load as load_container
 from app.loaders.database_loader import load as load_db
@@ -19,14 +21,14 @@ logger = logging.getLogger("alembic.env")
 
 load_container()
 load_db()
-database_engine = container_builder.get("sqlalchemy.engine.Engine")
+database_engine = default_container[Engine]
 
 # add your model's MetaData object here
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 config.set_main_option("sqlalchemy.url", str(database_engine.url).replace("%", "%%"))
-target_metadata = container_builder.get("sqlalchemy.MetaData")
+target_metadata = default_container[MetaData]
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
