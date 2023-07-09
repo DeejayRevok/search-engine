@@ -1,5 +1,5 @@
 from unittest import TestCase
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 from bus_station.command_terminal.bus.command_bus import CommandBus
 
@@ -13,7 +13,8 @@ class TestUserCreatedEventConsumer(TestCase):
         self.command_bus_mock = Mock(spec=CommandBus)
         self.event_consumer = UserCreatedEventConsumer(self.command_bus_mock)
 
-    def test_consume_success(self):
+    @patch("bus_station.passengers.passenger.uuid4")
+    def test_consume_success(self, *_):
         test_event = UserCreatedEvent(email="test_user_email")
 
         self.event_consumer.consume(test_event)
