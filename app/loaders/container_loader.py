@@ -8,7 +8,7 @@ sources_path = join(dirname(dirname(dirname(__file__))), "src")
 
 def load():
     SelfDiscoverDependencyLoader(
-        excluded_modules={"streamlit"},
+        excluded_modules={"graphql", "news_manager"},
         discovery_base_path=sources_path,
         sources_root_path=sources_path,
     ).load()
