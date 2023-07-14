@@ -1,4 +1,3 @@
-from bus_station.bus_stop.resolvers.yandil_bus_stop_resolver import YandilBusStopResolver
 from bus_station.passengers.serialization.passenger_json_deserializer import PassengerJSONDeserializer
 from bus_station.passengers.serialization.passenger_json_serializer import PassengerJSONSerializer
 from yandil.container import default_container
@@ -6,5 +5,4 @@ from yandil.container import default_container
 
 def load() -> None:
     default_container.add(PassengerJSONSerializer)
-    default_container.add(YandilBusStopResolver)
     default_container.add(PassengerJSONDeserializer)
