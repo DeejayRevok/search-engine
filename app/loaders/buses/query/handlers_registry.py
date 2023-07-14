@@ -17,4 +17,4 @@ def register() -> None:
     ]
 
     for query_handler in query_handlers:
-        registry.register(query_handler)
+        registry.register(default_container[query_handler])

@@ -19,4 +19,4 @@ def register() -> None:
         UpdateNewspaperCommandHandler,
     ]
     for command_handler in command_handlers:
-        registry.register(command_handler)
+        registry.register(default_container[command_handler])

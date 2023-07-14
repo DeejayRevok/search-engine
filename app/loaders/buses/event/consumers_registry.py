@@ -8,5 +8,5 @@ from application.save_user.user_created_event_consumer import UserCreatedEventCo
 def register() -> None:
     registry = default_container[EventConsumerRegistry]
 
-    registry.register(UserCreatedEventConsumer)
-    registry.register(NewSavedEventConsumer)
+    registry.register(default_container[UserCreatedEventConsumer])
+    registry.register(default_container[NewSavedEventConsumer])
